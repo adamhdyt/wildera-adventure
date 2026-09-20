@@ -1,0 +1,627 @@
+---
+title: "My Oracle Database Script Vault"
+excerpt: "A living collection of Oracle SQL and PL/SQL snippets I reach for again and again — tuning, monitoring, backups, and everyday DBA chores. Searchable and copy-ready."
+category: "tech"
+tag: "Databases"
+date: "Jul 12, 2026"
+readingTime: "Reference"
+featured: true
+cover: "/images/post-oracle.png"
+---
+<ScriptSearch />
+
+<Script title="Top SQL by CPU time" category="Performance">
+Find the most CPU-intensive statements in the shared pool — the usual first stop when the database feels slow.
+
+```sql
+SELECT sql_id,
+       ROUND(cpu_time / 1e6, 2) AS cpu_seconds,
+       executions,
+       ROUND(elapsed_time / 1e6, 2) AS elapsed_seconds,
+       SUBSTR(sql_text, 1, 80) AS sql_preview
+FROM   v$sqlarea
+ORDER  BY cpu_time DESC
+FETCH FIRST 10 ROWS ONLY;
+```
+</Script>
+
+<Script title="Tablespace free space" category="Monitoring">
+Report used vs. free space per tablespace so you can catch a full datafile before it pages you at 3 a.m.
+
+```sql
+SELECT df.tablespace_name,
+       ROUND(df.total_mb, 1) AS total_mb,
+       ROUND(df.total_mb - fs.free_mb, 1) AS used_mb,
+       ROUND(fs.free_mb, 1) AS free_mb,
+       ROUND((df.total_mb - fs.free_mb) / df.total_mb * 100, 1) AS pct_used
+FROM   (SELECT tablespace_name, SUM(bytes) / 1024 / 1024 total_mb
+        FROM   dba_data_files
+        GROUP  BY tablespace_name) df
+JOIN   (SELECT tablespace_name, SUM(bytes) / 1024 / 1024 free_mb
+        FROM   dba_free_space
+        GROUP  BY tablespace_name) fs
+  ON   df.tablespace_name = fs.tablespace_name
+ORDER  BY pct_used DESC;
+```
+</Script>
+
+<Script title="Find blocking sessions" category="Monitoring">
+List sessions that are blocking others, including the blocker and waiter SIDs. Great for diagnosing lock contention.
+
+```sql
+SELECT s.blocking_session AS blocker_sid,
+       s.sid              AS waiter_sid,
+       s.username,
+       s.event,
+       s.seconds_in_wait
+FROM   v$session s
+WHERE  s.blocking_session IS NOT NULL
+ORDER  BY s.seconds_in_wait DESC;
+```
+</Script>
+
+<Script title="Generate index rebuild statements" category="Maintenance">
+Produce ALTER INDEX ... REBUILD ONLINE commands for a schema. Review the output before running it.
+
+```sql
+SELECT 'ALTER INDEX ' || index_name || ' REBUILD ONLINE;' AS ddl
+FROM   user_indexes
+WHERE  index_type = 'NORMAL'
+  AND  status = 'VALID'
+ORDER  BY index_name;
+```
+</Script>
+
+<Script title="Gather schema statistics" category="Maintenance">
+Refresh optimizer statistics for a whole schema so the cost-based optimizer makes good plan choices.
+
+```plsql
+BEGIN
+  DBMS_STATS.GATHER_SCHEMA_STATS(
+    ownname          => 'APP_OWNER',
+    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,
+    cascade          => TRUE,
+    degree           => 4
+  );
+END;
+/
+```
+</Script>
+
+<Script title="log failed logins" category="PL/SQL">
+A simple procedure that records failed login attempts into an audit table for a lightweight security trail.
+
+```plsql
+CREATE OR REPLACE PROCEDURE log_failed_login (
+  p_username IN VARCHAR2,
+  p_ip       IN VARCHAR2
+) AS
+BEGIN
+  INSERT INTO login_audit (username, ip_address, attempted_at, status)
+  VALUES (p_username, p_ip, SYSTIMESTAMP, 'FAILED');
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE;
+END log_failed_login;
+/
+```
+</Script>
+
+<Script title="Data Pump export (schema backup)" category="Backup">
+A Data Pump command to export a single schema. Run from the OS shell with a configured directory object.
+
+```bash
+# Create the directory object once (as a privileged user)
+# CREATE OR REPLACE DIRECTORY dp_dir AS '/u01/backups';
+# GRANT READ, WRITE ON DIRECTORY dp_dir TO app_owner;
+
+# Then export from the shell:
+expdp app_owner/password \
+  schemas=APP_OWNER \
+  directory=dp_dir \
+  dumpfile=app_owner_%U.dmp \
+  logfile=app_owner_exp.log
+```
+</Script>
+
+
+
+<Script title="Check CPU HIGH" category="Performance">
+Queries to identify which sessions or SQL statements are consuming the most CPU time.
+
+```sql
+--Check percent CPU of SQL_ID
+ALTER SESSION SET NLS_DATE_FORMAT='DD-Mon-RR HH24:MI:SS';
+SET LINES 160 PAGES 5000 TIMING ON;
+COL NAME FORMAT A26
+COL USERNAME FORMAT A15
+COL PROGRAM FORMAT A40
+COL SESS_CPU_SECS WRA FORMAT 999,999,999.99
+COL LAST_CPU_SECS WRA FORMAT 999,999,999.99
+COL LOGON_SECS WRA FORMAT 999,999,999
+COL PERCENT WRA FORMAT 999.99
+SELECT SESS_CPU.SID, SESS_CPU.SERIAL#, NVL(sess_cpu.username, 'Oracle Process') USERNAME, SESS_CPU.STATUS, SESS_CPU.LOGON_TIME,
+ROUND((SYSDATE-SESS_CPU.LOGON_TIME)*1440*60) LOGON_SECS, SESS_CPU.VALUE/100 SESS_CPU_SECS, (SESS_CPU.VALUE-CALL_CPU.VALUE)/100 LAST_CPU_SECS,
+ROUND((SESS_CPU.VALUE/100)/ROUND((SYSDATE-SESS_CPU.LOGON_TIME)*1440*60)*100,2) PERCENT, SESS_CPU.SQL_ID
+FROM
+(
+  SELECT SE.SQL_ID, SS.STATISTIC#, SE.SID, SE.SERIAL#, SE.USERNAME, SE.STATUS, SE.PROGRAM, SE.LOGON_TIME, SN.NAME, SS.VALUE
+  FROM V$SESSION SE, V$SESSTAT SS, V$STATNAME SN
+  WHERE SE.SID=SS.SID AND SN.STATISTIC#=SS.STATISTIC# AND SN.NAME IN ('CPU used by this session')
+) SESS_CPU,
+(
+  SELECT SS.STATISTIC#,SE.SID,SS.VALUE,VALUE/100 SECONDS
+  FROM V$SESSION SE, V$SESSTAT SS, V$STATNAME SN
+  WHERE SE.SID=SS.SID
+  AND SN.STATISTIC#=SS.STATISTIC#
+  AND SN.NAME IN ('CPU used when call started')
+) CALL_CPU
+WHERE SESS_CPU.SID=CALL_CPU.SID ORDER BY SESS_CPU_SECS DESC;
+
+--Check CPU usage seconds
+SELECT S.USERNAME, T.SID||','||S.SERIAL# SIDSERIAL, SUM(VALUE/100) CPU_USAGE_SECONDS
+FROM V$SESSION S, V$SESSTAT T, V$STATNAME N
+WHERE
+T.STATISTIC#=N.STATISTIC#
+AND NAME LIKE '%CPU used by this session%'
+AND T.SID=S.SID
+AND S.STATUS='ACTIVE'
+AND S.USERNAME IS NOT NULL
+GROUP BY USERNAME,T.SID||','||S.SERIAL#
+ORDER BY 3 DESC;
+
+--Check cpu high v2
+col metric_name for a25
+col metric_unit for a25
+select metric_name, value, metric_unit from v$sysmetric where metric_name like '%cpu%' and group_id=2;
+
+select 'CPU_ORA_CONSUMED' CLASS,round(value/100,3) AAS from v$sysmetric where metric_name='CPU Usage Per Sec' and group_id=2
+union
+select 'CPU_OS' CLASS, round((prcnt.busy*parameter.cpu_count)/100,3) sAAS from
+(select value busy from v$sysmetric where metric_name='Host CPU Utilization (%)' and group_id=2) prcnt,
+(select value cpu_count from v$parameter where name='cpu_count') parameter;
+
+select 'CPU_ORA_CONSUMED' CLASS, round(value/100,3) AAS from v$sysmetric where metric_name='CPU Usage Per Sec' and group_id=2
+union all
+select 'CPU_OS' CLASS, round((prcnt.busy*parameter.cpu_count)/100,3) AAS from
+(select value busy from v$sysmetric where metric_name='Host CPU Utilization (%)' and group_id=2) prcnt,
+(select value cpu_count from v$parameter where name='cpu_count') parameter
+union all
+select 'CPU_ORA_DEMAND' CLASS, nvl(round( sum(decode(session_state,'ON CPU',1,0))/60,2),0) AAS
+from v$active_session_history ash where SAMPLE_TIME > sysdate - (60/(24*60*60));
+
+select
+                 decode(n.wait_class,'User I/O','User I/O',
+                                     'Commit','Commit',
+                                     'Wait')                               CLASS,
+                 sum(round(m.time_waited/m.INTSIZE_CSEC,3))                AAS
+           from  v$waitclassmetric  m,
+                 v$system_wait_class n
+           where m.wait_class_id=n.wait_class_id
+             and n.wait_class != 'Idle'
+           group by  decode(n.wait_class,'User I/O','User I/O', 'Commit','Commit', 'Wait')
+          union
+             select 'CPU_ORA_CONSUMED'                                     CLASS,
+                    round(value/100,3)                                     AAS
+             from v$sysmetric
+             where metric_name='CPU Usage Per Sec'
+               and group_id=2
+          union
+            select 'CPU_OS'                                                CLASS ,
+                    round((prcnt.busy*parameter.cpu_count)/100,3)          AAS
+            from
+              ( select value busy from v$sysmetric where metric_name='Host CPU Utilization (%)' and group_id=2 ) prcnt,
+              ( select value cpu_count from v$parameter where name='cpu_count' )  parameter
+          union
+             select
+               'CPU_ORA_DEMAND'                                            CLASS,
+               nvl(round( sum(decode(session_state,'ON CPU',1,0))/60,2),0) AAS
+             from v$active_session_history ash
+             where SAMPLE_TIME > sysdate - (60/(24*60*60));
+
+```
+</Script>
+
+<Script title="Advanced Locking Sessions" category="Monitoring">
+Detailed queries to detect and resolve database locking, including blocker and waiter information.
+
+```sql
+--CHECK LOCKING-----------
+--===========================================================================================
+SELECT
+ blocking_session "BLOCKING_SESSION",
+ sid "BLOCKED_SESSION",
+ serial# "BLOCKED_SERIAL#",
+ seconds_in_wait/60 "WAIT_TIME(MINUTES)"
+FROM v$session
+WHERE blocking_session is not NULL
+ORDER BY blocking_session;
+
+--check locking with serial OS
+
+SELECT SID, SERIAL#, OSUSER, MACHINE, PROGRAM, MODULE
+FROM V$SESSION 
+WHERE SID='1152';
+
+--This script can detect locked objects by querying v$locked_object and v$lock:
+select
+   (select username from v$session where sid=a.sid) blocker,
+   a.sid,
+   ' is blocking ',
+   (select username from v$session where sid=b.sid) blockee,
+   b.sid
+from
+   v$lock a,
+   v$lock b
+where
+   a.block = 1
+and
+   b.request > 0
+and
+   a.id1 = b.id1
+and
+   a.id2 = b.id2;
+   
+--The following script can be used in order quickly identify all lock objects within your Oracle system.
+select
+   c.owner,
+   c.object_name,
+   c.object_type,
+   b.sid,
+   b.serial#,
+   b.status,
+   b.osuser,
+   b.machine
+from
+   v$locked_object a ,
+   v$session b,
+   dba_objects c
+where
+   b.sid = a.session_id
+and
+   a.object_id = c.object_id;
+   
+--For kill session
+--ALTER SYSTEM KILL SESSION 'SID, SERIAL' IMMEDIATE;
+
+--Check session with killed status
+SELECT L.SID, L.TYPE, L.ID1, L.ID2, L.LMODE, L.REQUEST, L.BLOCK
+FROM V$LOCK L
+WHERE L.sid IN (SELECT SID FROM V$SESSION WHERE STATUS ='KILLED');
+
+--Check Holder and blocker
+SELECT /*+ RULE */ DECODE(l.request,0,'Holder:',' Waiter:') blocker, lpad(' ',DECODE(l.request,0,0,1))||l.sid sid,
+       s.serial#, l.inst_id, to_char(trunc(sysdate) + (l.ctime/24/60/60), 'HH24:MI:SS') seconds_in_wait,
+       s.status, s.logon_time,
+       --decode(l.request, 0, s.sql_id, null, s.prev_sql_id, s.prev_sql_id) sql_id, s.sql_hash_value,
+       DECODE(l.request,0,'',' ')||decode(s.sql_id, null, s.prev_sql_id, s.sql_id) sql_id,
+       decode(l.lmode,
+              0,'(0)None',
+              1,'(1)Null',
+              2,'(2)Row Share',
+              3,'(3)Row Exclu',
+              4,'(4)Share',
+              5,'(5)Share Row Ex',
+              6,'(6)Exclusive') lmode,
+       decode(l.request,
+              0,'(0)None',
+              1,'(1)Null',
+              2,'(2)Row Share',
+              3,'(3)Row Exclu',
+              4,'(4)Share',
+              5,'(5)Share Row Ex',
+              6,'(6)Exclusive') request,
+       l.type, l.block
+  FROM gv$session s, gv$lock l
+ WHERE EXISTS (SELECT 1 FROM gv$lock o WHERE o.lmode = 0 and o.id1 = l.id1 and o.id2 = l.id2)
+   and l.inst_id = s.inst_id
+   and l.sid = s.sid
+--   and l.lmode=6
+--   and l.request=0
+--   and l.block>1
+--   and l.ctime > 600
+ORDER BY l.id1,l.request;
+
+```
+</Script>
+
+<Script title="Check Session and Processes utilization" category="Monitoring">
+Query v$resource_limit to quickly see your session and process utilization.
+
+```sql
+-- How to Check  Session and processes value
+select resource_name, current_utilization, max_utilization, limit_value 
+    from v$resource_limit 
+    where resource_name in ('sessions', 'processes');
+
+```
+</Script>
+
+<Script title="Check Temp Tablespace Usage" category="Monitoring">
+Find out how much temp space is used, free, and which sessions are consuming it.
+
+```sql
+--Check total size for temp (used and free)
+SELECT tablespace_name, SUM(bytes_used) / 1024 / 1024 AS mb_used, SUM(bytes_free) / 1024 / 1024 AS mb_free
+FROM v$temp_space_header
+GROUP BY tablespace_name;
+
+--Check what program used on temp
+SELECT S.SID, S.SERIAL#, S.USERNAME, S.PROGRAM, T.TABLESPACE, T.BLOCKS * TS.BLOCK_SIZE / 1024 / 1024 AS TEMP_USED_MB, T.SEGTYPE, T.CONTENTS
+FROM V$SORT_USAGE T
+JOIN V$SESSION S ON T.SESSION_ADDR = S.SADDR
+JOIN DBA_TABLESPACES TS ON T.TABLESPACE = TS.TABLESPACE_NAME
+ORDER BY TEMP_USED_MB DESC;
+
+--Check % free and % used on temp
+SELECT /* + RULE */ df.tablespace_name "Tablespace",
+df.bytes / (1024 * 1024) "Size (MB)",
+SUM(fs.bytes) / (1024 * 1024) "Free (MB)",
+Nvl(Round(SUM(fs.bytes) * 100 / df.bytes),1) "% Free",
+Round((df.bytes - SUM(fs.bytes)) * 100 / df.bytes) "% Used"
+FROM dba_free_space fs,
+(SELECT tablespace_name,SUM(bytes) bytes
+FROM dba_data_files
+GROUP BY tablespace_name) df
+WHERE fs.tablespace_name (+) = df.tablespace_name
+GROUP BY df.tablespace_name,df.bytes
+UNION ALL
+SELECT /* + RULE */ df.tablespace_name tspace,
+fs.bytes / (1024 * 1024),
+SUM(df.bytes_free) / (1024 * 1024),
+Nvl(Round((SUM(fs.bytes) - df.bytes_used) * 100 / fs.bytes), 1),
+Round((SUM(fs.bytes) - df.bytes_free) * 100 / fs.bytes)
+FROM dba_temp_files fs,
+(SELECT tablespace_name,bytes_free,bytes_used
+FROM v$temp_space_header
+GROUP BY tablespace_name,bytes_free,bytes_used) df
+WHERE fs.tablespace_name (+) = df.tablespace_name
+GROUP BY df.tablespace_name,fs.bytes,df.bytes_free,df.bytes_used
+ORDER BY 4 DESC;
+
+--Check real % used on temp
+select (s.tot_used_blocks/f.total_blocks)*100 as "percent used"
+from (select sum(used_blocks) tot_used_blocks
+from v$sort_segment where tablespace_name='TEMP') s,
+(select sum(blocks) total_blocks
+from dba_temp_files where tablespace_name='TEMP') f;
+
+--Check total size for temp (used and free)
+SELECT * FROM 
+(SELECT a.tablespace_name,SUM(a.bytes/1024/1024)allocated_mb 
+FROM dba_temp_files a
+WHERE a.tablespace_name = 'TEMP'  
+GROUP BY a.tablespace_name) x,(SELECT SUM(b.bytes_used/1024/1024) used_mb,
+SUM(b.bytes_free /1024/1024) free_mb
+FROM v$temp_space_header b   WHERE b.tablespace_name = 'TEMP'  GROUP BY b.tablespace_name);
+
+--CHECK SESSION AKTIF DI TEMP
+SELECT S.SID, S.SERIAL#, S.USERNAME, T.TABLESPACE, T.SEGFILE#, T.SEGBLK#, T.BLOCKS
+FROM V$SORT_USAGE T
+JOIN V$SESSION S ON T.SESSION_ADDR = S.SADDR
+WHERE T.TABLESPACE = 'TEMP';
+
+```
+</Script>
+
+<Script title="Check Table and Index Sizes" category="Maintenance">
+Check the total sizes of tables, indexes, and partitions for a specific schema.
+
+```sql
+--CHECK SIZE TABLE, INDEX, DAN PARTISI
+--==================================================================================
+--Count total table
+SELECT OWNER, COUNT(*) AS TABLE_COUNT 
+FROM ALL_TABLES 
+WHERE OWNER IN (
+    SELECT USERNAME FROM DBA_USERS
+    WHERE ORACLE_MAINTAINED='N'
+    )
+GROUP BY OWNER 
+ORDER BY TABLE_COUNT DESC;
+
+--LIST ALL TABLE on specific owner
+SELECT OWNER, TABLE_NAME 
+FROM DBA_TABLES
+WHERE OWNER ='SCHEMA_NAME'
+ORDER BY 2;
+
+---CHECK  SIZE TABLE
+SELECT OWNER, SEGMENT_NAME, DS.TABLESPACE_NAME,
+ROUND(SUM(DS.BYTES) / (1024 * 1024 * 1024),2) AS GB
+    FROM DBA_SEGMENTS DS
+   WHERE SEGMENT_NAME
+   IN (SELECT TABLE_NAME FROM DBA_TABLES)
+   AND OWNER ='SCHEMA_NAME'
+   AND SEGMENT_NAME='TABLE_NAME_1'
+   GROUP BY DS.TABLESPACE_NAME,
+       SEGMENT_NAME,
+       OWNER
+       ORDER BY GB DESC;
+
+--CHECK 50 ROWS TABLE TERBESAR
+SELECT
+    S.OWNER,
+    S.SEGMENT_NAME AS TABLE_NAME,
+    S.TABLESPACE_NAME,
+    ROUND(SUM(S.BYTES)/(1024*1024*1024), 2) AS SIZE_GB
+FROM DBA_SEGMENTS S
+JOIN DBA_USERS U ON S.OWNER = U.USERNAME
+WHERE S.SEGMENT_NAME
+IN (SELECT TABLE_NAME FROM DBA_TABLES)
+AND U.ORACLE_MAINTAINED='N'
+GROUP BY S.OWNER, S.SEGMENT_NAME, S.TABLESPACE_NAME
+ORDER BY SIZE_GB DESC
+FETCH FIRST 50 ROWS ONLY;
+   
+--Check partisi table & index
+select * from dba_tab_partitions where table_name='TABLE_NAME_2' and TABLE_OWNER='SCHEMA_NAME';
+
+select * from dba_ind_partitions where index_name like '%INDEX_NAME_1%';
+
+select OWNER,STATUS from dba_tables where table_name='TABLE_NAME_2';
+
+--Check ukuran partisi
+SELECT 
+    segment_name,
+    partition_name,
+    ROUND(SUM(bytes)/1024/1024/1024, 2) AS size_gb
+FROM 
+    dba_segments
+WHERE 
+    segment_type = 'TABLE PARTITION'
+    AND segment_name = 'TABLE_NAME_2'
+GROUP BY 
+    segment_name, partition_name
+ORDER BY 
+    partition_name DESC;
+	
+--Check / compare size data
+SELECT /*+parallel(8)*/ SEGMENT_NAME,DS.TABLESPACE_NAME, 
+ROUND(SUM(DS.BYTES) / (1024 * 1024 * 1024),2) AS GB
+    FROM DBA_SEGMENTS DS
+    WHERE SEGMENT_NAME IN ('TABLE_NAME_3','TABLE_NAME_3_BAK')
+    GROUP BY DS.TABLESPACE_NAME,
+        SEGMENT_NAME
+        ORDER BY GB DESC;
+	
+--Check Primary key on table
+SELECT 
+    a.CONSTRAINT_NAME,
+    b.COLUMN_NAME
+FROM
+    ALL_CONSTRAINTS a
+JOIN
+    ALL_CONS_COLUMNS b
+    ON a.CONSTRAINT_NAME = b.CONSTRAINT_NAME
+WHERE
+    a.OWNER='SCHEMA_NAME' AND 
+    a.TABLE_NAME='TABLE_NAME_4'
+AND
+    a.CONSTRAINT_TYPE='P';
+
+```
+</Script>
+
+<Script title="Check Invalid Objects" category="Maintenance">
+Identify all invalid objects in the database that might need recompilation.
+
+```sql
+--COUNT TOTAL INVALID OBJECT---
+
+SELECT COUNT(*) FROM DBA_OBJECTS WHERE STATUS = 'INVALID';
+
+---LIST INVALID OBJECT--
+--PROMPT * INVALID OBJECT DETAIL
+--col owner for a10
+SELECT owner,object_type,count(OBJECT_TYPE) FROM DBA_OBJECTS WHERE STATUS = 'INVALID' group by owner,object_type;
+
+--Check all invalid object
+SELECT
+    OWNER,
+    OBJECT_NAME,
+    SUBOBJECT_NAME,
+    OBJECT_ID,
+    STATUS
+FROM ALL_OBJECTS
+WHERE STATUS='INVALID';
+
+```
+</Script>
+
+<Script title="Datapump Export and Import Guide" category="Backup">
+Snippets for performing advanced Datapump exports and imports, including using parfiles and checking progress.
+
+```bash
+1. Check avability for directories datapump
+SELECT OWNER, DIRECTORY_NAME, DIRECTORY_PATH
+FROM DBA_DIRECTORIES;
+
+2. Create new directories datapump if not available
+CREATE OR REPLACE DIRECTORY "NAME_DIR" AS '/PATH/DIR'
+
+3. Do Export data 
+--Export with parfile
+vi expdp_table_data.par
+userid='admin/password'
+directory=DATA_PUMP_DIR
+dumpfile=expdp_table_data.dmp
+logfile=expdp_table_data.log
+TABLES= SCHEMA_NAME.table_data
+compression=all
+COMPRESSION_ALGORITHM=BASIC
+content=DATA_ONLY
+
+--After done creating parfile run with
+nohup expdp parilfe=expdp_table_data.par 2>&1 &
+expdp parilfe=expdp_table_data.par
+
+--Export no parfile
+nohup expdp admin/password directory=DATA_PUMP_DIR dumpfile=expdp_table_data.dmp logfile=expdp_table_data.log TABLES=SCHEMA_NAME.TABLE_NAME compression=all COMPRESSION_ALGORITHM=BASIC content=DATA_ONLY 2>&1 &
+
+--IF YOU NEED TO CHANGES VERSION FROM ORACLE 19C TO 12.1 YOU CAN USE THIS 
+vi expdp_table_data.par
+userid='admin/password'
+directory=DATA_PUMP_DIR
+dumpfile=expdp_table_data.dmp
+logfile=expdp_table_data.log
+TABLES= SCHEMA_NAME.table_data
+compression=all
+COMPRESSION_ALGORITHM=BASIC
+content=DATA_ONLY
+VERSION=12.1
+
+
+4. Do Import data
+--Import with parfile
+vi impdp_table_data.par
+userid='admin/password'
+directory=DATA_PUMP_DIR
+dumpfile=expdp_table_data.dmp
+logfile=impdp_table_data.log
+TABLES= SCHEMA_NAME.table_data
+
+--After done creating parfile run with
+nohup expdp parilfe=impdp_table_data.par 2>&1 &
+impdp parilfe=impdp_table_data.par
+ 
+--Export no parfile
+nohup impdp admin/password directory=DATA_PUMP_DIR dumpfile=expdp_table_data.dmp logfile=impdp_table_data.log TABLES=SCHEMA_NAME.TABLE_NAME  2>&1 &
+
+--IMPORT WITH REMAP SCHEMA OR TABLE SPACE
+vi impdp_table_data.par
+userid='admin/password'
+directory=DATA_PUMP_DIR
+dumpfile=expdp_table_data.dmp
+logfile=impdp_table_data.log
+REMAP_TABLESPACE=OLD_TABLESPACE:NEW_TABLESPACE
+SCHEMAS=OLD_SCEMA REMAP_SCHEMA=OLD_SCHEMA:NEW_SCHEMA
+
+
+--CHECK PROGRESS
+SELECT SID, SERIAL#, OPNAME, SOFAR, TOTALWORK, ROUND(SOFAR/TOTALWORK*100,2) COMPLETE
+FROM V$SESSION_LONGOPS
+WHERE TOTALWORK !=0 AND SOFAR != TOTALWORK
+ORDER BY 1;
+
+Masuk ke status job expdp/impdp
+========================================
+expdp admin/password attach=SYS_EXPORT_TABLE_03
+expdp \"/ as dbadmin\" attach=SYS_EXPORT_SCHEMA_02
+impdp \"/ as dbadmin\" attach=SYS_EXPORT_SCHEMA_02
+
+Admisnistrasi ketika proses impdp/expdp
+===========================================
+To increase level of parallelism on running datapump job do the following :
+- identify job name (select owner_name, job_name from dba_datapump_jobs);
+- connect to it : impdp attach=schema.job_name
+- change parallelism : parallel=n (n - number of parallel workers)
+- wait a bit for change to aplly
+- confirm change : status
+
+```
+</Script>
+
+

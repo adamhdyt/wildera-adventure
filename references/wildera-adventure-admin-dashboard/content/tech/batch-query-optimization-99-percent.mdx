@@ -1,0 +1,133 @@
+---
+title: "Slashing Batch Latency by >99%: A Financial Database Tuning Case Study"
+excerpt: "How bottleneck diagnostics with AWR/ASH, SQL execution plan re-engineering, and partitioning cut a critical end-of-month financial batch job from 14 hours down to under 6 minutes."
+category: "tech"
+tag: "Performance"
+date: "Oct 22, 2025"
+readingTime: "12 min read"
+featured: true
+cover: "/images/post-datalayer.png"
+---
+
+At the end of every financial month, commercial banking databases experience intense, compute-heavy batch processing: general ledger consolidation, interest accrual calculations, account standing assessments, and regulatory compliance reporting.
+
+A critical reporting batch job responsible for calculating monthly loan interest and amortizations began suffering from severe latency degradation. Over six consecutive months, its execution time ballooned from **2 hours** to **over 14 hours**, routinely threatening to breach the morning cutoff window when branches open for customer service.
+
+This case study breaks down how we systematically diagnosed the root cause using Oracle Active Session History (ASH), re-engineered execution plans, optimized indexing structures, and slashed total runtime from **14 hours 28 minutes** to **5 minutes 44 seconds**—a **99.3% reduction in latency**.
+
+---
+
+## 1. Initial Assessment & AWR Profiling
+
+Rather than applying guesswork or adjusting database instance parameters arbitrarily, we pulled Automatic Workload Repository (AWR) and ASH reports specifically for the time window of the degrading batch job.
+
+### Top Timed Events Observed
+1. `db file sequential read` (Single-block I/O reads): accounting for **64.2%** of total database time.
+2. `cursor: pin S wait on X` (Library cache contention): accounting for **19.8%**.
+3. `CPU time`: only accounting for **11.4%**.
+
+```sql
+-- Querying Active Session History for dominant wait events during batch run
+SELECT 
+    event,
+    COUNT(*) AS wait_count,
+    ROUND(COUNT(*) * 100 / SUM(COUNT(*)) OVER(), 2) AS pct_activity
+FROM v$active_session_history
+WHERE sample_time BETWEEN TO_TIMESTAMP('2025-09-30 22:00:00', 'YYYY-MM-DD HH24:MI:SS')
+                      AND TO_TIMESTAMP('2025-10-01 06:00:00', 'YYYY-MM-DD HH24:MI:SS')
+  AND session_type = 'FOREGROUND'
+GROUP BY event
+ORDER BY wait_count DESC;
+```
+
+The data pointed to an unmistakable pathology: the database was spending nearly two-thirds of its time waiting on disk I/O to fetch individual table blocks, rather than processing data in memory.
+
+---
+
+## 2. Pinpointing the Offending SQL
+
+Using `V$SQL` and `DBMS_XPLAN.DISPLAY_CURSOR`, we isolated the primary culprit: a complex multi-table `SELECT ... UPDATE` construct processing historical loan transactions (`LOAN_TXN_LEDGER`, containing over 140 million rows).
+
+```sql
+-- Inspecting actual execution statistics and row source operations
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(
+    sql_id => '9k8mqtzv7w1px',
+    cursor_child_no => 0,
+    format => 'ALLSTATS LAST +COST +PREDICATE'
+));
+```
+
+### The Execution Plan Bottlenecks
+The query plan revealed two catastrophic inefficiencies:
+1. **Cartesian-Like Nested Loops**: The Cost-Based Optimizer (CBO) estimated that an inner table join would produce 4,200 rows. In reality, under real production data skew, it was producing **38.6 million rows**. As a result, the optimizer chose a `NESTED LOOPS` join instead of a `HASH JOIN`. For every one of the 38 million rows, the engine performed a random disk lookup on `LOAN_TXN_LEDGER`.
+2. **Implicit Data Type Conversion**: A filter predicate joined `VARCHAR2(20)` customer reference codes to a `CHAR(20)` legacy column, preventing the engine from using the primary B-tree index and forcing repeated **Index Full Scans**.
+
+---
+
+## 3. The Re-Engineering Strategy
+
+To solve this sustainably without altering the application code base (which required months of vendor release cycles), we applied a three-pronged database-level solution:
+
+### A. Extended Statistics & Histogram Tuning
+The CBO was underestimating rows due to multi-column correlation between `LOAN_TYPE_CODE` and `STATUS_FLAG`. We created extended statistics to allow the optimizer to accurately price the cardinality:
+
+```sql
+-- Creating column group statistics for correlated predicates
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        ownname => 'COREBANK',
+        tabname => 'LOAN_TXN_LEDGER',
+        method_opt => 'FOR COLUMNS (LOAN_TYPE_CODE, STATUS_FLAG) SIZE 254',
+        cascade => TRUE,
+        degree => 8
+    );
+END;
+/
+```
+
+### B. Index Re-Engineering: Composite Covering Index
+The previous indexing strategy required visiting the table block for every matched index entry. We engineered a **Composite Index** with column inclusion (`LOAN_ID`, `TXN_DATE`, `ACCRUAL_AMT`, `STATUS_FLAG`), enabling an **Index Only Scan (Index Fast Full Scan)** that completely eliminated table block visits:
+
+```sql
+CREATE INDEX idx_loan_accrual_covering 
+ON COREBANK.LOAN_TXN_LEDGER (STATUS_FLAG, TXN_DATE, LOAN_ID, ACCRUAL_AMT)
+TABLESPACE TS_CORE_INDEX
+ONLINE PARALLEL 8;
+
+ALTER INDEX idx_loan_accrual_covering NOPARALLEL;
+```
+
+### C. SQL Plan Management (SPM) Stabilization
+To ensure the optimizer consistently selects the optimal `HASH JOIN` and covering index path regardless of runtime variable values, we captured the optimal execution plan and enforced it as a fixed baseline:
+
+```sql
+-- Enforcing the optimal plan baseline
+DECLARE
+    v_plans PLS_INTEGER;
+BEGIN
+    v_plans := DBMS_SPM.LOAD_PLANS_FROM_CURSOR_CACHE(
+        sql_id => '9k8mqtzv7w1px',
+        plan_hash_value => 2841094382,
+        fixed => 'YES',
+        enabled => 'YES'
+    );
+END;
+/
+```
+
+---
+
+## 4. Benchmark & Production Results
+
+Following deployment ahead of the month-end closing cycle, the results exceeded all expectations:
+
+| Metric | Before Tuning | After Tuning | Improvement |
+|---|---|---|---|
+| **Total Batch Elapsed Time** | 14h 28m 10s | **5m 44s** | **> 99.3% Faster** |
+| **Physical Read I/O Blocks** | 48,290,114 | **84,310** | **99.8% Reduction** |
+| **Buffer Gets (Logical Reads)**| 1.82 Billion | **14.2 Million** | **99.2% Reduction** |
+| **CPU Time Consumed** | 3,840 sec | **182 sec** | **95.2% Reduction** |
+| **Buffer Cache Hit Ratio** | 82.4% | **99.1%** | **+16.7% Gain** |
+
+### Key Takeaway for DBAs
+More hardware or allocating gigabytes to the buffer cache rarely fixes systemic latency issues. Deep diagnostic analysis using AWR/ASH and execution plan telemetry allows DBAs to surgically pinpoint root causes and deliver orders-of-magnitude performance gains with zero disruption to application architecture.

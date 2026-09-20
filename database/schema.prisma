@@ -1,0 +1,605 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../apps/api/src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DestinationStatus {
+  ACTIVE
+  INACTIVE
+
+  @@map("destination_status")
+}
+
+enum DifficultyLevel {
+  EASY
+  MODERATE
+  HARD
+  EXTREME
+
+  @@map("difficulty_level")
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@map("content_status")
+}
+
+enum TripType {
+  OPEN_TRIP
+  PRIVATE_TRIP
+  TEKTOK
+  MULTI_DAY
+
+  @@map("trip_type")
+}
+
+enum FacilityType {
+  INCLUDE
+  EXCLUDE
+
+  @@map("facility_type")
+}
+
+enum GearType {
+  MANDATORY
+  RECOMMENDED
+
+  @@map("gear_type")
+}
+
+enum ScheduleStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  CANCELLED
+  COMPLETED
+
+  @@map("schedule_status")
+}
+
+enum EntityStatus {
+  ACTIVE
+  INACTIVE
+
+  @@map("entity_status")
+}
+
+enum BookingStatus {
+  INQUIRY
+  PENDING_CONFIRMATION
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+
+  @@map("booking_status")
+}
+
+enum BookingSource {
+  WEBSITE_WHATSAPP
+  WHATSAPP
+  INSTAGRAM
+  ADMIN
+  OTHER
+
+  @@map("booking_source")
+}
+
+enum GenderType {
+  MALE
+  FEMALE
+
+  @@map("gender_type")
+}
+
+enum IdentityType {
+  KTP
+  PASSPORT
+  OTHER
+
+  @@map("identity_type")
+}
+
+enum PrivateTripStatus {
+  NEW
+  CONTACTED
+  QUOTATION_SENT
+  NEGOTIATION
+  BOOKED
+  LOST
+
+  @@map("private_trip_status")
+}
+
+enum MediaRole {
+  COVER
+  GALLERY
+
+  @@map("media_role")
+}
+
+enum AdminStatus {
+  ACTIVE
+  DISABLED
+
+  @@map("admin_status")
+}
+
+model Destination {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String            @db.VarChar(120)
+  slug           String            @unique @db.VarChar(140)
+  province       String?           @db.VarChar(120)
+  region         String?           @db.VarChar(120)
+  description    String?           @db.Text
+  status         DestinationStatus @default(ACTIVE)
+  seoTitle       String?           @map("seo_title") @db.VarChar(160)
+  seoDescription String?           @map("seo_description") @db.VarChar(320)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt      DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  mountains      Mountain[]
+
+  @@map("destinations")
+}
+
+model Mountain {
+  id                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  destinationId     String               @map("destination_id") @db.Uuid
+  name              String               @db.VarChar(160)
+  slug              String               @unique @db.VarChar(180)
+  altitudeM         Int?                 @map("altitude_m")
+  shortDescription  String?              @map("short_description") @db.Text
+  description       String?              @db.Text
+  defaultDifficulty DifficultyLevel?     @map("default_difficulty")
+  bestSeason        String?              @map("best_season") @db.VarChar(255)
+  latitude          Decimal?             @db.Decimal(9, 6)
+  longitude         Decimal?             @db.Decimal(9, 6)
+  status            ContentStatus        @default(DRAFT)
+  seoTitle          String?              @map("seo_title") @db.VarChar(160)
+  seoDescription    String?              @map("seo_description") @db.VarChar(320)
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt         DateTime?            @map("deleted_at") @db.Timestamptz(6)
+  destination       Destination          @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  routes            Route[]
+  trips             Trip[]
+  media             MountainMedia[]
+  privateInquiries  PrivateTripInquiry[]
+
+  @@index([destinationId])
+  @@map("mountains")
+}
+
+model Route {
+  id                     String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  mountainId             String           @map("mountain_id") @db.Uuid
+  name                   String           @db.VarChar(160)
+  slug                   String           @db.VarChar(180)
+  description            String?          @db.Text
+  distanceKm             Decimal?         @map("distance_km") @db.Decimal(6, 2)
+  elevationGainM         Int?             @map("elevation_gain_m")
+  estimatedDurationHours Decimal?         @map("estimated_duration_hours") @db.Decimal(5, 2)
+  difficulty             DifficultyLevel?
+  startingPoint          String?          @map("starting_point") @db.VarChar(255)
+  status                 ContentStatus    @default(DRAFT)
+  createdAt              DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt              DateTime?        @map("deleted_at") @db.Timestamptz(6)
+  mountain               Mountain         @relation(fields: [mountainId], references: [id], onDelete: Restrict)
+  trips                  Trip[]
+
+  @@unique([mountainId, slug])
+  @@map("routes")
+}
+
+model Trip {
+  id                        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  mountainId                String          @map("mountain_id") @db.Uuid
+  routeId                   String?         @map("route_id") @db.Uuid
+  name                      String          @db.VarChar(200)
+  slug                      String          @unique @db.VarChar(220)
+  tripType                  TripType        @map("trip_type")
+  shortDescription          String?         @map("short_description") @db.Text
+  description               String?         @db.Text
+  durationDays              Int             @map("duration_days") @db.SmallInt
+  durationNights            Int             @default(0) @map("duration_nights") @db.SmallInt
+  difficulty                DifficultyLevel
+  beginnerFriendly          Boolean         @default(false) @map("beginner_friendly")
+  healthCertificateRequired Boolean         @default(false) @map("health_certificate_required")
+  minimumAge                Int?            @map("minimum_age") @db.SmallInt
+  maximumAge                Int?            @map("maximum_age") @db.SmallInt
+  status                    ContentStatus   @default(DRAFT)
+  featured                  Boolean         @default(false)
+  seoTitle                  String?         @map("seo_title") @db.VarChar(160)
+  seoDescription            String?         @map("seo_description") @db.VarChar(320)
+  publishedAt               DateTime?       @map("published_at") @db.Timestamptz(6)
+  createdBy                 String          @map("created_by") @db.Uuid
+  createdAt                 DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                 DateTime?       @map("deleted_at") @db.Timestamptz(6)
+  mountain                  Mountain        @relation(fields: [mountainId], references: [id], onDelete: Restrict)
+  route                     Route?          @relation(fields: [routeId], references: [id], onDelete: Restrict)
+  creator                   AdminUser       @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  itineraries               TripItinerary[]
+  facilities                TripFacility[]
+  gears                     TripGear[]
+  faqs                      TripFaq[]
+  schedules                 TripSchedule[]
+  media                     TripMedia[]
+
+  @@index([status])
+  @@index([mountainId])
+  @@map("trips")
+}
+
+model TripItinerary {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId      String   @map("trip_id") @db.Uuid
+  dayNumber   Int      @map("day_number") @db.SmallInt
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  sortOrder   Int      @default(0) @map("sort_order") @db.SmallInt
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Restrict)
+
+  @@unique([tripId, dayNumber])
+  @@map("trip_itineraries")
+}
+
+model TripFacility {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId       String       @map("trip_id") @db.Uuid
+  facilityType FacilityType @map("facility_type")
+  name         String       @db.VarChar(200)
+  description  String?      @db.Text
+  sortOrder    Int          @default(0) @map("sort_order") @db.SmallInt
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  trip         Trip         @relation(fields: [tripId], references: [id], onDelete: Restrict)
+
+  @@index([tripId])
+  @@map("trip_facilities")
+}
+
+model TripGear {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId      String   @map("trip_id") @db.Uuid
+  gearType    GearType @map("gear_type")
+  name        String   @db.VarChar(200)
+  description String?  @db.Text
+  sortOrder   Int      @default(0) @map("sort_order") @db.SmallInt
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Restrict)
+
+  @@index([tripId])
+  @@map("trip_gears")
+}
+
+model TripFaq {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId    String        @map("trip_id") @db.Uuid
+  question  String        @db.Text
+  answer    String        @db.Text
+  sortOrder Int           @default(0) @map("sort_order") @db.SmallInt
+  status    ContentStatus @default(DRAFT)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  trip      Trip          @relation(fields: [tripId], references: [id], onDelete: Restrict)
+
+  @@index([tripId])
+  @@map("trip_faqs")
+}
+
+model TripSchedule {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId               String            @map("trip_id") @db.Uuid
+  startDate            DateTime          @map("start_date") @db.Date
+  endDate              DateTime          @map("end_date") @db.Date
+  registrationDeadline DateTime?         @map("registration_deadline") @db.Timestamptz(6)
+  capacity             Int               @db.SmallInt
+  minimumParticipants  Int?              @map("minimum_participants") @db.SmallInt
+  status               ScheduleStatus    @default(DRAFT)
+  notes                String?           @db.Text
+  createdBy            String            @map("created_by") @db.Uuid
+  createdAt            DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  trip                 Trip              @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  creator              AdminUser         @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  packages             SchedulePackage[]
+  bookings             Booking[]
+
+  @@index([tripId])
+  @@index([startDate])
+  @@index([status, startDate])
+  @@map("trip_schedules")
+}
+
+model MeetingPoint {
+  id        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String            @db.VarChar(180)
+  city      String?           @db.VarChar(120)
+  address   String?           @db.Text
+  latitude  Decimal?          @db.Decimal(9, 6)
+  longitude Decimal?          @db.Decimal(9, 6)
+  notes     String?           @db.Text
+  status    EntityStatus      @default(ACTIVE)
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  packages  SchedulePackage[]
+
+  @@map("meeting_points")
+}
+
+model SchedulePackage {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scheduleId      String        @map("schedule_id") @db.Uuid
+  meetingPointId  String?       @map("meeting_point_id") @db.Uuid
+  name            String        @db.VarChar(180)
+  description     String?       @db.Text
+  price           Decimal       @db.Decimal(14, 2)
+  meetingDatetime DateTime?     @map("meeting_datetime") @db.Timestamptz(6)
+  status          EntityStatus  @default(ACTIVE)
+  sortOrder       Int           @default(0) @map("sort_order") @db.SmallInt
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  schedule        TripSchedule  @relation(fields: [scheduleId], references: [id], onDelete: Restrict)
+  meetingPoint    MeetingPoint? @relation(fields: [meetingPointId], references: [id], onDelete: Restrict)
+  bookings        Booking[]
+
+  @@unique([id, scheduleId])
+  @@index([scheduleId])
+  @@map("schedule_packages")
+}
+
+model Customer {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName       String    @map("full_name") @db.VarChar(180)
+  whatsappNumber String    @map("whatsapp_number") @db.VarChar(30)
+  email          String?   @db.VarChar(254)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  bookings       Booking[]
+
+  @@map("customers")
+}
+
+model Booking {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bookingNumber      String               @unique @map("booking_number") @db.VarChar(40)
+  customerId         String?              @map("customer_id") @db.Uuid
+  scheduleId         String               @map("schedule_id") @db.Uuid
+  packageId          String               @map("package_id") @db.Uuid
+  status             BookingStatus        @default(INQUIRY)
+  source             BookingSource
+  participantCount   Int                  @map("participant_count") @db.SmallInt
+  totalAmount        Decimal?             @map("total_amount") @db.Decimal(14, 2)
+  contactName        String               @map("contact_name") @db.VarChar(180)
+  contactWhatsapp    String               @map("contact_whatsapp") @db.VarChar(30)
+  contactEmail       String?              @map("contact_email") @db.VarChar(254)
+  notes              String?              @db.Text
+  cancellationReason String?              @map("cancellation_reason") @db.Text
+  confirmedAt        DateTime?            @map("confirmed_at") @db.Timestamptz(6)
+  cancelledAt        DateTime?            @map("cancelled_at") @db.Timestamptz(6)
+  completedAt        DateTime?            @map("completed_at") @db.Timestamptz(6)
+  createdBy          String               @map("created_by") @db.Uuid
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  customer           Customer?            @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  schedule           TripSchedule         @relation(fields: [scheduleId], references: [id], onDelete: Restrict)
+  package            SchedulePackage      @relation(fields: [packageId, scheduleId], references: [id, scheduleId], onDelete: Restrict, onUpdate: Restrict)
+  creator            AdminUser            @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  participants       BookingParticipant[]
+
+  @@index([scheduleId, status])
+  @@index([status])
+  @@index([customerId])
+  @@index([contactWhatsapp])
+  @@map("bookings")
+}
+
+model BookingParticipant {
+  id                    String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bookingId             String        @map("booking_id") @db.Uuid
+  fullName              String        @map("full_name") @db.VarChar(180)
+  dateOfBirth           DateTime?     @map("date_of_birth") @db.Date
+  gender                GenderType?
+  phone                 String?       @db.VarChar(30)
+  identityType          IdentityType? @map("identity_type")
+  identityNumber        String?       @map("identity_number") @db.VarChar(100)
+  emergencyContactName  String?       @map("emergency_contact_name") @db.VarChar(180)
+  emergencyContactPhone String?       @map("emergency_contact_phone") @db.VarChar(30)
+  notes                 String?       @db.Text
+  createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  booking               Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+  @@map("booking_participants")
+}
+
+model PrivateTripInquiry {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  inquiryNumber       String            @unique @map("inquiry_number") @db.VarChar(40)
+  mountainId          String?           @map("mountain_id") @db.Uuid
+  destinationOther    String?           @map("destination_other") @db.VarChar(200)
+  customerName        String            @map("customer_name") @db.VarChar(180)
+  whatsappNumber      String            @map("whatsapp_number") @db.VarChar(30)
+  email               String?           @db.VarChar(254)
+  preferredDate       DateTime          @map("preferred_date") @db.Date
+  alternativeDate     DateTime?         @map("alternative_date") @db.Date
+  participantCount    Int               @map("participant_count") @db.SmallInt
+  meetingPointRequest String?           @map("meeting_point_request") @db.VarChar(255)
+  budget              Decimal?          @db.Decimal(14, 2)
+  requirements        String?           @db.Text
+  status              PrivateTripStatus @default(NEW)
+  assignedAdminId     String?           @map("assigned_admin_id") @db.Uuid
+  adminNotes          String?           @map("admin_notes") @db.Text
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  mountain            Mountain?         @relation(fields: [mountainId], references: [id], onDelete: Restrict)
+  assignedAdmin       AdminUser?        @relation(fields: [assignedAdminId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([whatsappNumber])
+  @@map("private_trip_inquiries")
+}
+
+model MediaAsset {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  objectKey     String          @unique @map("object_key") @db.VarChar(500)
+  url           String          @db.Text
+  mimeType      String          @map("mime_type") @db.VarChar(120)
+  fileSizeBytes BigInt          @map("file_size_bytes")
+  widthPx       Int?            @map("width_px")
+  heightPx      Int?            @map("height_px")
+  altText       String?         @map("alt_text") @db.VarChar(255)
+  createdBy     String          @map("created_by") @db.Uuid
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  creator       AdminUser       @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  trips         TripMedia[]
+  mountains     MountainMedia[]
+
+  @@map("media_assets")
+}
+
+model TripMedia {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tripId    String     @map("trip_id") @db.Uuid
+  mediaId   String     @map("media_id") @db.Uuid
+  mediaRole MediaRole  @map("media_role")
+  sortOrder Int        @default(0) @map("sort_order") @db.SmallInt
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  trip      Trip       @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@index([tripId])
+  @@map("trip_media")
+}
+
+model MountainMedia {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  mountainId String     @map("mountain_id") @db.Uuid
+  mediaId    String     @map("media_id") @db.Uuid
+  mediaRole  MediaRole  @map("media_role")
+  sortOrder  Int        @default(0) @map("sort_order") @db.SmallInt
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  mountain   Mountain   @relation(fields: [mountainId], references: [id], onDelete: Restrict)
+  media      MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@index([mountainId])
+  @@map("mountain_media")
+}
+
+model Faq {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category  String?       @db.VarChar(100)
+  question  String        @db.Text
+  answer    String        @db.Text
+  sortOrder Int           @default(0) @map("sort_order") @db.SmallInt
+  status    ContentStatus @default(DRAFT)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("faqs")
+}
+
+model ContentPage {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pageKey        String        @unique @map("page_key") @db.VarChar(100)
+  title          String        @db.VarChar(200)
+  slug           String        @unique @db.VarChar(200)
+  content        String        @db.Text
+  status         ContentStatus @default(DRAFT)
+  seoTitle       String?       @map("seo_title") @db.VarChar(160)
+  seoDescription String?       @map("seo_description") @db.VarChar(320)
+  publishedAt    DateTime?     @map("published_at") @db.Timestamptz(6)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("content_pages")
+}
+
+model SiteSetting {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  settingKey   String     @unique @map("setting_key") @db.VarChar(120)
+  settingValue Json       @map("setting_value") @db.JsonB
+  isPublic     Boolean    @default(false) @map("is_public")
+  updatedBy    String?    @map("updated_by") @db.Uuid
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  updater      AdminUser? @relation(fields: [updatedBy], references: [id], onDelete: Restrict)
+
+  @@map("site_settings")
+}
+
+model AdminUser {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String               @db.VarChar(180)
+  email        String               @unique @db.VarChar(254)
+  passwordHash String               @map("password_hash") @db.Text
+  status       AdminStatus          @default(ACTIVE)
+  lastLoginAt  DateTime?            @map("last_login_at") @db.Timestamptz(6)
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  roles        AdminUserRole[]
+  trips        Trip[]
+  schedules    TripSchedule[]
+  bookings     Booking[]
+  privateLeads PrivateTripInquiry[]
+  mediaAssets  MediaAsset[]
+  siteSettings SiteSetting[]
+  auditLogs    AuditLog[]
+
+  @@map("admin_users")
+}
+
+model Role {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String          @db.VarChar(100)
+  slug        String          @unique @db.VarChar(100)
+  description String?         @db.Text
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  adminUsers  AdminUserRole[]
+
+  @@map("roles")
+}
+
+model AdminUserRole {
+  adminUserId String    @map("admin_user_id") @db.Uuid
+  roleId      String    @map("role_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@id([adminUserId, roleId])
+  @@map("admin_user_roles")
+}
+
+model AuditLog {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminUserId String?    @map("admin_user_id") @db.Uuid
+  action      String     @db.VarChar(120)
+  entityType  String     @map("entity_type") @db.VarChar(120)
+  entityId    String?    @map("entity_id") @db.Uuid
+  oldValue    Json?      @map("old_value") @db.JsonB
+  newValue    Json?      @map("new_value") @db.JsonB
+  requestId   String?    @map("request_id") @db.VarChar(100)
+  ipAddress   String?    @map("ip_address") @db.Inet
+  userAgent   String?    @map("user_agent") @db.Text
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId])
+  @@index([adminUserId])
+  @@map("audit_logs")
+}

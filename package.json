@@ -1,0 +1,57 @@
+{
+  "name": "wildera-adventure",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.18.0",
+  "engines": {
+    "node": ">=24.12.0 <25",
+    "npm": ">=11 <12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test:admin": "node scripts/test-admin.mts",
+    "dev": "concurrently --kill-others --names web,api \"npm run dev -w @wildera/web\" \"npm run dev -w @wildera/api\"",
+    "build": "npm run db:generate && npm run build --workspaces --if-present",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "npm run db:generate && tsc -p tsconfig.tooling.json && tsc -p database/tsconfig.json --noEmit && npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:local:start": "node scripts/local-postgres.mts start",
+    "db:local:stop": "node scripts/local-postgres.mts stop",
+    "db:local:status": "node scripts/local-postgres.mts status",
+    "db:format": "prisma format",
+    "db:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:seed": "prisma db seed",
+    "db:reset": "node scripts/reset-database.mts",
+    "db:test": "npm run db:generate && npm run test:db -w @wildera/api"
+  },
+  "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.2"
+    },
+    "prisma": {
+      "mysql2": "3.24.4"
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "8.23.1",
+    "concurrently": "^9.2.0",
+    "dotenv": "17.3.1",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.0",
+    "prettier": "^3.6.0",
+    "prisma": "7.10.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.0.0"
+  }
+}

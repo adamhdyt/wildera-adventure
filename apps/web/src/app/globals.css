@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+@import './public.css';
+@source '../../../../../packages/ui/src';
+
+body {
+  margin: 0;
+  font-family: var(--default-font-family, Arial, Helvetica, sans-serif);
+  background-color: var(--color-background, #f6f0e9);
+  color: var(--color-foreground, #3d1f2a);
+}
+
+@media (min-width: 1024px) {
+  .desktop-sidebar {
+    display: flex !important;
+  }
+  .mobile-filter-bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  .mobile-filter-bar {
+    display: flex !important;
+  }
+}

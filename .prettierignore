@@ -1,0 +1,17 @@
+node_modules
+.next
+dist
+coverage
+.local
+references
+apps/api/src/generated
+**/next-env.d.ts
+package-lock.json
+docs/01_*.md
+docs/02_*.md
+docs/03_*.md
+docs/04_*.md
+docs/05_*.md
+docs/06_*.md
+docs/Prompt Master Development Step-by-Step — Wildera Adventure.md
+Technical Blueprint Website Wildera Adventure.md

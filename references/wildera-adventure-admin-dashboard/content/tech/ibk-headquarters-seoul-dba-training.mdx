@@ -1,0 +1,95 @@
+---
+title: "Enterprise High Availability & DR at Scale: Field Notes from IBK Headquarters, Seoul"
+excerpt: "Key architectural takeaways, cross-region disaster recovery simulations, and multi-node RAC clustering practices from intensive enterprise DBA training at Industrial Bank of Korea Headquarters."
+category: "tech"
+tag: "Architecture"
+date: "Nov 18, 2025"
+readingTime: "9 min read"
+featured: true
+cover: "/images/tech_notes_banner.png"
+---
+
+Operating mission-critical core banking systems requires more than theoretical database administration; it demands hands-on mastery over complex high-availability (HA) topologies, automated disaster recovery drills, and split-second incident responses.
+
+As part of Bank IBK Indonesia's engineering talent development, I was selected for an intensive international database infrastructure training program at the **Industrial Bank of Korea (IBK) Headquarters in Seoul, South Korea**. 
+
+This document summarizes the enterprise architecture patterns, automated recovery workflows, and production clustering principles explored alongside IBK's global infrastructure engineering leads.
+
+---
+
+## 1. The Global Banking Scale Challenge
+
+IBK Korea supports millions of corporate and retail banking customers, processing billions of won in real-time transactions daily across Seoul, Tokyo, London, and international subsidiaries.
+
+At this tier of operation, downtime is measured not merely in minutes, but in millions of dollars of financial exposure and regulatory penalties. The operational standard is strictly defined:
+- **Zero RPO (Recovery Point Objective)**: Under no circumstance can a single verified financial transaction be lost, even during sudden data center outages.
+- **RTO (Recovery Time Objective) < 15 Minutes**: Full service failover to disaster recovery infrastructure must occur within minutes.
+- **Continuous Split-Brain Prevention**: Multi-node RAC clusters must cleanly arbitrate node evictions and fencing without data corruptions.
+
+---
+
+## 2. Deep Dive: Enterprise Multi-Node RAC Clustering
+
+One of the central tracks of the program focused on advanced Oracle Real Application Clusters (RAC) 19c management on engineered systems and Oracle Linux.
+
+### Key Focus Areas:
+1. **Cache Fusion Interconnect Tuning**: Investigating interconnect latency between cluster nodes. Even sub-millisecond delays on private interconnect switches can cause `gc buffer busy acquire` and `gc cr multi block request` cluster wait events under concurrent OLTP workloads.
+2. **Clusterware Fencing & Split-Brain Mitigation**: Configuring redundant Voting Disks across separate storage arrays and setting up IPMI fencing mechanisms to safely evict malfunctioning nodes without taking down the entire cluster.
+3. **ASM Flex Disk Groups & Quorum Disks**: Implementing optimal redundancy with dedicated quorum disks to guarantee cluster quorum even during complete storage rack failures.
+
+```bash
+# Cluster health telemetry and interconnect latency verification
+crsctl check cluster -all
+crsctl status resource -t
+oifcfg getif
+```
+
+---
+
+## 3. Disaster Recovery: Synchronous Far Sync & Active Data Guard
+
+In banking, disaster recovery data centers are often located hundreds of kilometers away to guard against natural disasters or metropolitan power grid failures. However, network physics introduces a dilemma: synchronous redo replication over long distances introduces noticeable latency to core banking transactions.
+
+At IBK Headquarters, we analyzed the deployment of **Oracle Far Sync instances**:
+
+```
+[Primary DC - Seoul] 
+        │ (Zero-latency synchronous replication)
+        ▼
+[Far Sync Instance - Seoul Metro Edge]
+        │ (Asynchronous high-bandwidth transport)
+        ▼
+[Disaster Recovery DC - Busan]
+```
+
+### Advantages of the Far Sync Architecture:
+- The primary production database in Seoul commits transactions synchronously to a lightweight **Far Sync** instance located nearby on ultra-low latency fiber.
+- The Far Sync instance ships the redo logs asynchronously to the distant DR data center in Busan.
+- If the primary data center experiences a total catastrophe, the Far Sync instance flushes all remaining redo logs to the DR standby before failover, guaranteeing **zero data loss (RPO = 0)** without imposing network latency on live transactions.
+
+---
+
+## 4. Live Disaster Recovery Switchover Drills
+
+A disaster recovery plan that has not been tested in live simulations is simply a theory. A major highlight of the technical program was participating in full-scale **Disaster Recovery Role Reversal Drills**:
+
+1. **Pre-Switchover Validation**: Checking Redo Transport Services, archive log gap sequences, and verifying that the standby database has applied all redo logs to within zero lag.
+2. **Automated Broker Cutover**:
+   ```sql
+   -- Validating readiness for role transition in Oracle Data Guard Broker
+   DGMGRL> VALIDATE DATABASE 'BUSAN_STANDBY';
+   DGMGRL> SWITCHOVER TO 'BUSAN_STANDBY';
+   ```
+3. **VIP & Application Redirection**: Testing automated client failover using Oracle Transparent Application Failover (TAF) and Fast Application Notification (FAN) events, confirming that connection pools redirected traffic with minimal connection resets.
+4. **Graceful Reinstatement**: After simulating primary host recovery, reinstating the former primary as a standby using Flashback Database without performing a time-consuming full database rebuild.
+
+---
+
+## 5. Applying the Principles at Bank IBK Indonesia
+
+The lessons learned from IBK Headquarters directly transformed our database administration workflows in Jakarta:
+- **Standardized AWR/ASH Baseline Automation**: Implemented automated bash and PL/SQL monitoring packages that alert on anomalous wait-event spikes before users report latency.
+- **Quarterly DR Readiness Drills**: Established structured, scheduled switchover drills to keep our local runbooks fresh and team execution sharp.
+- **Enhanced Oracle 19c RAC Deployment**: Applied verified kernel and network buffer parameters during our recent core banking database upgrades, ensuring bulletproof stability and high availability.
+
+Global perspective reinforces that great database engineering isn't about responding to disasters—it is about designing resilient systems where disasters become non-events.

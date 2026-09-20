@@ -1,0 +1,106 @@
+---
+title: "Zero-Downtime Core Banking Migration: Upgrading Oracle 12c to 19c RU 19.27"
+excerpt: "A deep dive into planning, dry-runs, and executing an enterprise core banking database upgrade from Oracle 12c to 19c with Active Data Guard switchover and zero transactional data loss."
+category: "tech"
+tag: "Oracle RAC"
+date: "Aug 14, 2025"
+readingTime: "10 min read"
+featured: true
+cover: "/images/post-oracle.png"
+---
+
+Upgrading a production core banking database is one of the most high-stakes operations in enterprise infrastructure. When transaction volumes peak in the millions and regulatory SLAs mandate near-zero downtime, a standard maintenance window with prolonged database downtime is out of the question.
+
+In this case study, I outline the methodology, architecture, and operational execution of upgrading our multi-terabyte production database from **Oracle Database 12c Release 2 (12.2.0.1)** to **Oracle Database 19c (Long-Term Support, Release Update 19.27)** at Bank IBK Indonesia.
+
+---
+
+## 1. Project Background & Business Constraints
+
+Our core banking tier powers branch tellers, ATM transactions, BI-FAST clearing, and real-time mobile banking. The existing 12c environment had performed reliably for years, but posed several long-term challenges:
+- **Premier Support Sunset**: Oracle 12.2 extended support was ending, requiring an upgrade to the 19c Long Term Support (LTS) release for ongoing security patches and regulatory compliance.
+- **Strict SLA Window**: The allowable maintenance switchover window was under **30 minutes**, with an RPO (Recovery Point Objective) of **zero data loss**.
+- **Multi-System Dependencies**: More than 40 downstream microservices, reporting pipelines, and payment gateways depended on constant database connectivity.
+
+---
+
+## 2. Architecture: Minimum-Downtime Rolling Strategy
+
+Rather than performing an in-place upgrade (which requires hours of downtime for database dictionary scripts), we engineered an **Active Data Guard (ADG) Transient Logical Standby / Rolling Switchover** strategy.
+
+### Architectural Setup
+1. **Primary Cluster (DC)**: 2-Node Oracle RAC on Oracle Linux 7.9, ASM storage with SSD tiering.
+2. **Physical Standby (DR)**: Geographically separated disaster recovery site running Active Data Guard in `MAXIMUM AVAILABILITY` mode.
+3. **Upgrade Target Host**: A parallel 19c RAC staging cluster pre-configured with identical ASM disk groups, kernel parameter tunings (`hugepages`, `sysctl.conf`), and Oracle Grid Infrastructure 19c.
+
+```sql
+-- Verifying Data Guard synchronization status prior to cutover
+SELECT 
+    NAME, 
+    DATABASE_ROLE, 
+    PROTECTION_MODE, 
+    SWITCHOVER_STATUS, 
+    DATAGUARD_BROKER 
+FROM V$DATABASE;
+
+-- Checking synchronization lag between DC and DR
+SELECT 
+    PRIMARY_DB_UNIQUE_NAME, 
+    STANDBY_DB_UNIQUE_NAME, 
+    SOURCE_DB_UNIQUE_NAME, 
+    APPLY_LAG, 
+    TRANSPORT_LAG 
+FROM V$DATAGUARD_STATS;
+```
+
+---
+
+## 3. Pre-Migration Verification & Real Application Testing (RAT)
+
+The biggest risk in major database version upgrades is **SQL execution plan regression**—queries that ran in milliseconds on 12c suddenly choosing suboptimal nested loops or full table scans under the new Cost-Based Optimizer (CBO) in 19c.
+
+To mitigate this, we deployed Oracle **Real Application Testing (RAT)**:
+1. **Production Workload Capture**: Captured 24 hours of real production transaction traffic during high-load month-end processing on 12c using `DBMS_WORKLOAD_CAPTURE`.
+2. **Workload Replay on Staging 19c**: Replayed the recorded workload against the newly patched 19c environment using `DBMS_WORKLOAD_REPLAY`.
+3. **SQL Performance Analyzer (SPA)**: Compared execution plans and elapsed CPU times. Over 98.4% of queries showed equal or improved performance; 18 queries that regressed were stabilized in advance using **SQL Plan Baselines (SPB)** via `DBMS_SPM`.
+
+```sql
+-- Loading verified 12c execution plans into 19c SQL Plan Baseline
+VARIABLE v_plan_count NUMBER;
+EXECUTE :v_plan_count := DBMS_SPM.LOAD_PLANS_FROM_SQLSET( -
+    sqlset_name => 'PROD_EOM_WORKLOAD_STS', -
+    basic_filter => 'parsing_schema_name = ''COREBANK'' AND action = ''BATCH_EXEC''', -
+    fixed => 'YES', -
+    enabled => 'YES' -
+);
+PRINT v_plan_count;
+```
+
+---
+
+## 4. Cutover Execution: The Switchover Sequence
+
+On the scheduled migration night, the execution checklist followed a strictly timed runbook:
+
+1. **T-Minus 60m**: Full RMAN incremental backup and storage snapshot freeze.
+2. **T-Minus 15m**: Freeze background batch processing and switch all applications to graceful read-only draining.
+3. **T-Minus 5m**: Final redo log flush to guarantee transport lag = 0 seconds.
+4. **T-Zero**: Execute broker switchover to the upgraded 19c instance:
+   ```bash
+   dgmgrl sys/********@CORE_BROKER
+   DGMGRL> SWITCHOVER TO 'CORE_19C_PRIMARY';
+   ```
+5. **T-Plus 8m**: Verification of listener endpoints, VIP failover, and SCAN (Single Client Access Name) redirection.
+6. **T-Plus 12m**: Application connectivity health check. All payment gateways and core banking services reconnected with zero socket errors.
+
+---
+
+## 5. Post-Migration Results & Production Metrics
+
+The upgrade achieved all technical and business targets:
+- **Total Maintenance Downtime**: **11 minutes 42 seconds** (well within the 30-minute allowance).
+- **Data Loss (RPO)**: **Zero**. Every committed transaction was fully preserved across standby redo logs.
+- **Query Performance Gain**: Average query latency dropped by **18%** due to improved adaptive query optimization and table partition pruning enhancements in 19c.
+- **Resource Utilization**: Memory buffer cache efficiency increased by **14%** following hugepages reconfiguration for the 19c SGA.
+
+This migration validated that with rigorous workload testing and automated Data Guard failover pipelines, tier-1 banking systems can undergo major version upgrades without risking customer transaction continuity.
