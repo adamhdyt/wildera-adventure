@@ -9,8 +9,11 @@ playwright-report/
 .env
 .env.*
 !.env.example
+!.env.production.example
 .DS_Store
 .idea/
 .vscode/
 .local/
+backups/
+apps/api/uploads/
 apps/api/src/generated/

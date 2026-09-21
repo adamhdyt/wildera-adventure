@@ -100,7 +100,7 @@ export function Destinations({ destinations }: DestinationsProps) {
             {cards.map((dest) => (
               <Link
                 key={dest.id}
-                href={`/destinasi?slug=${dest.slug}`}
+                href={`/gunung/${dest.slug}`}
                 className="group relative h-96 rounded-3xl overflow-hidden card shadow-md hover:shadow-2xl transition-all duration-500 flex flex-col justify-end p-6 border border-black/5"
               >
                 {/* Background Image with Zoom on Hover */}

@@ -141,12 +141,12 @@ describe('Security Hardening (STEP 36)', () => {
   describe('redactSensitiveData', () => {
     test('redacts database credentials from strings and stack traces', () => {
       const raw =
-        'Error at postgresql://wildera_admin:***@127.0.0.1:5432/wildera_prod';
+        'Error at postgresql://db_user:my_secret_pass_123@127.0.0.1:5432/wildera_prod';
       const cleaned = redactSensitiveData(raw);
-      assert.ok(!String(cleaned).includes('SuperSecretPass123!'));
+      assert.ok(!String(cleaned).includes('my_secret_pass_123'));
       assert.ok(
         String(cleaned).includes(
-          'postgresql://[REDACTED]:***@127.0.0.1:5432/wildera_prod',
+          'postgresql://[REDACTED]:[REDACTED]@127.0.0.1:5432/wildera_prod',
         ),
       );
     });

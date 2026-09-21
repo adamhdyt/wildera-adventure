@@ -12,7 +12,7 @@ interface HeroSlide {
 
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
-    url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2070&auto=format&fit=crop',
+    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
     alt: 'Pemandangan puncak Gunung Rinjani dan Danau Segara Anak',
     caption: 'Gunung Rinjani, Nusa Tenggara Barat',
   },

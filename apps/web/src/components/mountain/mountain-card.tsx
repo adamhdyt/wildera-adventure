@@ -10,27 +10,27 @@ const FALLBACK_MOUNTAIN_COVER =
 
 const DIFFICULTY_MAP: Record<
   string,
-  { label: string; badgeClass: string; dotClass: string }
+  { label: string; badgeBorder: string; dotClass: string }
 > = {
   EASY: {
     label: 'Santai (Easy)',
-    badgeClass: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
-    dotClass: 'bg-emerald-500',
+    badgeBorder: 'border-emerald-400/40',
+    dotClass: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]',
   },
   MODERATE: {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-    dotClass: 'bg-amber-500',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
   },
   HARD: {
     label: 'Menantang (Hard)',
-    badgeClass: 'bg-orange-500/10 text-orange-700 border-orange-500/20',
-    dotClass: 'bg-orange-500',
+    badgeBorder: 'border-amber-400/40',
+    dotClass: 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)]',
   },
   EXTREME: {
     label: 'Ekstrem (Extreme)',
-    badgeClass: 'bg-red-500/10 text-red-700 border-red-500/20',
-    dotClass: 'bg-red-500',
+    badgeBorder: 'border-rose-400/40',
+    dotClass: 'bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.9)]',
   },
 };
 
@@ -38,8 +38,8 @@ export function MountainCard({ mountain }: MountainCardProps) {
   const coverUrl = mountain.coverImage?.url || FALLBACK_MOUNTAIN_COVER;
   const diffConfig = DIFFICULTY_MAP[mountain.defaultDifficulty] ?? {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-    dotClass: 'bg-amber-500',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
   };
 
   return (
@@ -80,9 +80,12 @@ export function MountainCard({ mountain }: MountainCardProps) {
 
         {/* Difficulty badge top-right */}
         <div
-          className={`absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-semibold border backdrop-blur-sm ${diffConfig.badgeClass} bg-black/60`}
+          className={`absolute top-3 right-3 px-2.5 py-1 rounded text-xs font-semibold border backdrop-blur-md flex items-center gap-1.5 bg-black/75 text-white ${diffConfig.badgeBorder}`}
         >
-          {diffConfig.label}
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${diffConfig.dotClass}`}
+          />
+          <span>{diffConfig.label}</span>
         </div>
 
         {/* Destination bottom-left */}

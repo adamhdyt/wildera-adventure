@@ -48,7 +48,7 @@ export default async function PrivateTripPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar whatsappNumber={whatsappNumber} />
-      <main className="flex-1 py-12 md:py-16">
+      <main className="flex-1 pt-28 md:pt-36 pb-16 md:pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="text-center mb-10">

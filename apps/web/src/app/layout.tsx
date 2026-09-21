@@ -1,7 +1,20 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { FloatingWhatsApp } from '@/components/public/floating-whatsapp';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -21,7 +34,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="id">
+    <html
+      lang="id"
+      className={`${plusJakartaSans.variable} ${spaceGrotesk.variable}`}
+    >
       <body>
         {children}
         <FloatingWhatsApp />

@@ -47,7 +47,7 @@ export function FaqClient({ initialFaqs, whatsappNumber }: FaqClientProps) {
   )}`;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
       {/* Hero Heading */}
       <div className="text-center mb-12">
         <span className="inline-block px-3.5 py-1 text-xs font-semibold tracking-wider uppercase rounded-full bg-accent/10 text-accent mb-3">

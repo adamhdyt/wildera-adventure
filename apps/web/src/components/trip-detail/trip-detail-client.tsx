@@ -26,26 +26,30 @@ interface TripDetailClientProps {
 
 const DIFFICULTY_MAP: Record<
   string,
-  { label: string; badgeClass: string; desc: string }
+  { label: string; badgeBorder: string; dotClass: string; desc: string }
 > = {
   EASY: {
     label: 'Santai (Easy)',
-    badgeClass: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
+    badgeBorder: 'border-emerald-400/40',
+    dotClass: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]',
     desc: 'Medan relatif bersahabat dengan elevasi moderat. Cocok untuk pendaki pemula.',
   },
   MODERATE: {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
     desc: 'Membutuhkan stamina kardio yang baik dan daya tahan fisik untuk perjalanan beberapa jam berturut-turut.',
   },
   HARD: {
     label: 'Menantang (Hard)',
-    badgeClass: 'bg-orange-500/10 text-orange-700 border-orange-500/20',
+    badgeBorder: 'border-amber-400/40',
+    dotClass: 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)]',
     desc: 'Tanjakan terjal berkelanjutan, medan berbatu/berpasir, serta elevasi ekstrem. Memerlukan persiapan fisik intensif.',
   },
   EXTREME: {
     label: 'Ekstrem (Extreme)',
-    badgeClass: 'bg-red-500/10 text-red-700 border-red-500/20',
+    badgeBorder: 'border-rose-400/40',
+    dotClass: 'bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.9)]',
     desc: 'Medan teknis tingkat tinggi, jurang terbuka, paparan cuaca dingin ekstrem, dan durasi ekspedisi panjang.',
   },
 };
@@ -82,7 +86,8 @@ export function TripDetailClient({
 
   const diffConfig = DIFFICULTY_MAP[trip.difficulty] ?? {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
     desc: 'Membutuhkan stamina kardio yang baik dan daya tahan fisik.',
   };
 
@@ -178,9 +183,12 @@ export function TripDetailClient({
                 {trip.tripType === 'OPEN_TRIP' ? 'Open Trip' : 'Private Trip'}
               </span>
               <span
-                className={`px-2.5 py-1 rounded text-xs font-semibold border ${diffConfig.badgeClass} bg-black/60`}
+                className={`px-2.5 py-1 rounded text-xs font-semibold border backdrop-blur-md flex items-center gap-1.5 bg-black/75 text-white ${diffConfig.badgeBorder}`}
               >
-                {diffConfig.label}
+                <span
+                  className={`w-2 h-2 rounded-full shrink-0 ${diffConfig.dotClass}`}
+                />
+                <span>{diffConfig.label}</span>
               </span>
               {trip.beginnerFriendly && (
                 <span className="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">

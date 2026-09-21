@@ -9617,17 +9617,17 @@
   }
 }
 :root {
-  --background: #f6f0e9;
-  --card: #efe7dd;
-  --foreground: #3d1f2a;
-  --primary-cta: #3d1f2a;
-  --primary-cta-text: #f6f0e9;
-  --secondary-cta: #efe7dd;
-  --secondary-cta-text: #3d1f2a;
-  --accent: #8c4a5c;
-  --background-accent: #a86b7c;
-  --radius: 1.5rem;
-  --width-content-width: clamp(40rem, 72.5vw, 100rem);
+  --background: #051424;
+  --card: #0d1c2d;
+  --foreground: #d4e4fa;
+  --primary-cta: #e07a5f;
+  --primary-cta-text: #ffffff;
+  --secondary-cta: #173357;
+  --secondary-cta-text: #d4e4fa;
+  --accent: #e07a5f;
+  --background-accent: #122131;
+  --radius: 0.5rem;
+  --width-content-width: clamp(40rem, 78vw, 100rem);
   --vw-1_5: 1.5vw;
   --width-x-padding-mask-fade: 5vw;
   --width-carousel-padding: calc(
@@ -9645,43 +9645,43 @@
   --width-carousel-item-4: calc(
     var(--width-content-width) / 4 - var(--vw-1_5) / 4 * 3
   );
-  --text-2xs: clamp(0.465rem, 0.62vw, 0.62rem);
-  --text-xs: clamp(0.54rem, 0.72vw, 0.72rem);
-  --text-sm: clamp(0.615rem, 0.82vw, 0.82rem);
-  --text-base: clamp(0.69rem, 0.92vw, 0.92rem);
-  --text-lg: clamp(0.75rem, 1vw, 1rem);
-  --text-xl: clamp(0.825rem, 1.1vw, 1.1rem);
-  --text-2xl: clamp(0.975rem, 1.3vw, 1.3rem);
-  --text-3xl: clamp(1.2rem, 1.6vw, 1.6rem);
-  --text-4xl: clamp(1.5rem, 2vw, 2rem);
-  --text-5xl: clamp(2.025rem, 2.75vw, 2.75rem);
-  --text-6xl: clamp(2.475rem, 3.3vw, 3.3rem);
-  --text-7xl: clamp(3rem, 4vw, 4rem);
-  --text-8xl: clamp(3.5rem, 4.5vw, 4.5rem);
-  --text-9xl: clamp(5.25rem, 7vw, 7rem);
+  --text-2xs: 0.75rem;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  --text-8xl: 5.25rem;
+  --text-9xl: 6.5rem;
 }
 @media (max-width: 1440px) and (min-width: 769px) {
   :root {
-    --width-content-width: 87.5vw;
+    --width-content-width: 88vw;
   }
 }
 @media (max-width: 768px) {
   :root {
-    --text-2xs: 2.5vw;
-    --text-xs: 2.75vw;
-    --text-sm: 3vw;
-    --text-base: 3.25vw;
-    --text-lg: 3.5vw;
-    --text-xl: 4.25vw;
-    --text-2xl: 5vw;
-    --text-3xl: 6vw;
-    --text-4xl: 7vw;
-    --text-5xl: 7.5vw;
-    --text-6xl: 8.5vw;
-    --text-7xl: 10vw;
-    --text-8xl: 12vw;
-    --text-9xl: 14vw;
-    --width-content-width: 80vw;
+    --text-2xs: 0.75rem;
+    --text-xs: 0.8125rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.375rem;
+    --text-3xl: 1.625rem;
+    --text-4xl: 2rem;
+    --text-5xl: 2.375rem;
+    --text-6xl: 2.75rem;
+    --text-7xl: 3.25rem;
+    --text-8xl: 3.75rem;
+    --text-9xl: 4.5rem;
+    --width-content-width: calc(100vw - 2.5rem);
     --width-carousel-padding: calc(
       (100vw - var(--width-content-width)) / 2 + 1px - 1rem
     );
@@ -9695,7 +9695,7 @@
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(43, 24, 10, 0.3) rgba(255, 255, 255, 0);
+  scrollbar-color: rgba(27, 67, 50, 0.25) transparent;
 }
 html {
   overscroll-behavior: none;
@@ -9705,99 +9705,79 @@ body {
   margin: 0;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', sans-serif;
+  font-family:
+    'Plus Jakarta Sans',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   position: relative;
   min-height: 100vh;
   overscroll-behavior: none;
   overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
-  font-family: 'Inter', sans-serif;
+h6,
+.font-display,
+.font-headline {
+  font-family:
+    'Space Grotesk',
+    'Plus Jakarta Sans',
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.03em;
 }
 .card {
-  backdrop-filter: blur(8px);
-  background: linear-gradient(
-    to bottom right,
-    var(--color-card),
-    var(--color-card)
-  );
-  @supports (color: color-mix(in lab, red, red)) {
-    background: linear-gradient(
-      to bottom right,
-      color-mix(in srgb, var(--color-card) 80%, transparent),
-      color-mix(in srgb, var(--color-card) 40%, transparent)
-    );
-  }
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  border: 1px solid var(--color-card);
+  background: var(--color-card, #0d1c2d);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px -2px rgba(0, 0, 0, 0.4),
+    0 2px 6px -1px rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 .primary-button {
-  background: var(--color-primary-cta);
+  background: var(--color-primary-cta, #e07a5f);
+  color: var(--color-primary-cta-text, #ffffff);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
-    var(--color-background) 0px 3px 1px 0px inset,
-    var(--color-primary-cta) 0px 0.839802px 0.503881px -0.3125px,
-    var(--color-primary-cta) 0px 1.99048px 1.19429px -0.625px,
-    var(--color-primary-cta) 0px 3.63084px 2.1785px -0.9375px,
-    var(--color-primary-cta) 0px 6.03627px 3.62176px -1.25px,
-    var(--color-primary-cta) 0px 9.74808px 5.84885px -1.5625px,
-    var(--color-primary-cta) 0px 15.9566px 9.57398px -1.875px,
-    var(--color-primary-cta) 0px 27.4762px 16.4857px -2.1875px,
-    var(--color-primary-cta) 0px 50px 30px -2.5px;
-  @supports (color: color-mix(in lab, red, red)) {
-    box-shadow:
-      color-mix(in srgb, var(--color-background) 20%, transparent) 0px 3px 1px
-        0px inset,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        0.839802px 0.503881px -0.3125px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        1.99048px 1.19429px -0.625px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        3.63084px 2.1785px -0.9375px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        6.03627px 3.62176px -1.25px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        9.74808px 5.84885px -1.5625px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        15.9566px 9.57398px -1.875px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px
-        27.4762px 16.4857px -2.1875px,
-      color-mix(in srgb, var(--color-primary-cta) 13%, transparent) 0px 50px
-        30px -2.5px;
-  }
+    0 2px 6px 0 rgba(224, 122, 95, 0.25),
+    0 4px 14px 0 rgba(224, 122, 95, 0.15);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.primary-button:hover {
+  background: #cb6a50;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px 0 rgba(224, 122, 95, 0.35);
+}
+.primary-button:active {
+  transform: translateY(0);
 }
 .secondary-button {
-  background:
-    radial-gradient(circle at 0% 0%, var(--color-accent) 0%, transparent 40%),
-    radial-gradient(
-      circle at 100% 100%,
-      var(--color-accent) 0%,
-      transparent 40%
-    ),
-    var(--color-secondary-cta);
-  @supports (color: color-mix(in lab, red, red)) {
-    background:
-      radial-gradient(
-        circle at 0% 0%,
-        color-mix(in srgb, var(--color-accent) 15%, transparent) 0%,
-        transparent 40%
-      ),
-      radial-gradient(
-        circle at 100% 100%,
-        color-mix(in srgb, var(--color-accent) 15%, transparent) 0%,
-        transparent 40%
-      ),
-      var(--color-secondary-cta);
-  }
-  box-shadow: 2.10837px 3.16256px 9.48767px var(--color-accent);
-  @supports (color: color-mix(in lab, red, red)) {
-    box-shadow: 2.10837px 3.16256px 9.48767px
-      color-mix(in srgb, var(--color-accent) 10%, transparent);
-  }
+  background: var(--color-secondary-cta, #173357);
+  color: var(--color-secondary-cta-text, #d4e4fa);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.secondary-button:hover {
+  background: #1f4270;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.secondary-button:active {
+  transform: translateY(0);
 }
 @property --tw-translate-x {
   syntax: '*';

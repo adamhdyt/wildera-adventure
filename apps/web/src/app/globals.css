@@ -2,11 +2,53 @@
 @import './public.css';
 @source '../../../../../packages/ui/src';
 
+:root {
+  --background: #051424;
+  --foreground: #d4e4fa;
+  --card: #0d1c2d;
+  --card-foreground: #d4e4fa;
+  --primary: #ffffff;
+  --primary-foreground: #0b1e36;
+  --primary-cta: #e07a5f;
+  --primary-cta-text: #ffffff;
+  --secondary: #173357;
+  --secondary-foreground: #d4e4fa;
+  --secondary-cta: #173357;
+  --secondary-cta-text: #d4e4fa;
+  --accent: #e07a5f;
+  --accent-foreground: #ffffff;
+  --background-accent: #122131;
+  --border: #273647;
+  --muted: #173357;
+  --muted-foreground: #94a3b8;
+  --radius: 0.5rem;
+}
+
 body {
   margin: 0;
-  font-family: var(--default-font-family, Arial, Helvetica, sans-serif);
-  background-color: var(--color-background, #f6f0e9);
-  color: var(--color-foreground, #3d1f2a);
+  font-family:
+    'Plus Jakarta Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: var(--background, #051424);
+  color: var(--foreground, #d4e4fa);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display,
+.font-headline {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important;
+  letter-spacing: 0.03em;
 }
 
 @media (min-width: 1024px) {
@@ -16,6 +58,12 @@ body {
   .mobile-filter-bar {
     display: none !important;
   }
+  .catalog-main-layout {
+    display: grid !important;
+    grid-template-columns: 18rem minmax(0, 1fr) !important;
+    gap: 2rem !important;
+    align-items: start !important;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -24,5 +72,30 @@ body {
   }
   .mobile-filter-bar {
     display: flex !important;
+  }
+  .catalog-main-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    gap: 3rem;
   }
 }

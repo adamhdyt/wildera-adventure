@@ -40,7 +40,7 @@ export function ContentPageView({
     : 'September 2026';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
       {/* Header Banner */}
       <div className="mb-10 pb-8 border-b border-black/10">
         <div className="flex flex-wrap items-center gap-2 text-xs text-foreground/60 mb-3">

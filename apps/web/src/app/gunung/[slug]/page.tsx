@@ -20,26 +20,30 @@ interface PageProps {
 
 const DIFFICULTY_MAP: Record<
   string,
-  { label: string; badgeClass: string; desc: string }
+  { label: string; badgeBorder: string; dotClass: string; desc: string }
 > = {
   EASY: {
     label: 'Santai (Easy)',
-    badgeClass: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
+    badgeBorder: 'border-emerald-400/40',
+    dotClass: 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]',
     desc: 'Medan relatif landai dengan waktu tempuh singkat. Cocok untuk pemula dan pendaki keluarga.',
   },
   MODERATE: {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
     desc: 'Kombinasi jalur hutan dan tanjakan berkelanjutan. Memerlukan daya tahan kardio dan fisik prima.',
   },
   HARD: {
     label: 'Menantang (Hard)',
-    badgeClass: 'bg-orange-500/10 text-orange-700 border-orange-500/20',
+    badgeBorder: 'border-amber-400/40',
+    dotClass: 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)]',
     desc: 'Medan teknis dengan elevasi ekstrem, kontur terjal berbatu atau berpasir, dan durasi pendakian panjang.',
   },
   EXTREME: {
     label: 'Ekstrem (Extreme)',
-    badgeClass: 'bg-red-500/10 text-red-700 border-red-500/20',
+    badgeBorder: 'border-rose-400/40',
+    dotClass: 'bg-rose-400 shadow-[0_0_6px_rgba(244,63,94,0.9)]',
     desc: 'Tantangan puncak tertinggi dengan paparan cuaca ekstrem, jurang terbuka, dan rute navigasi intensif.',
   },
 };
@@ -280,7 +284,8 @@ export default async function MountainDetailPage({ params }: PageProps) {
     '6281234567890';
   const diffConfig = DIFFICULTY_MAP[mountain.defaultDifficulty] ?? {
     label: 'Sedang (Moderate)',
-    badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+    badgeBorder: 'border-sky-400/40',
+    dotClass: 'bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.9)]',
     desc: 'Kombinasi jalur hutan dan tanjakan berkelanjutan. Memerlukan daya tahan kardio dan fisik prima.',
   };
 
@@ -377,9 +382,12 @@ export default async function MountainDetailPage({ params }: PageProps) {
           <div className="flex flex-col gap-3">
             <div className="inline-flex items-center gap-2">
               <span
-                className={`px-3 py-1 rounded text-xs font-semibold border ${diffConfig.badgeClass}`}
+                className={`px-3 py-1 rounded text-xs font-semibold border backdrop-blur-md flex items-center gap-1.5 bg-black/75 text-white ${diffConfig.badgeBorder}`}
               >
-                {diffConfig.label}
+                <span
+                  className={`w-2 h-2 rounded-full shrink-0 ${diffConfig.dotClass}`}
+                />
+                <span>{diffConfig.label}</span>
               </span>
               <span className="text-xs text-white/80 font-medium">
                 {mountain.destination?.name}
@@ -517,9 +525,7 @@ export default async function MountainDetailPage({ params }: PageProps) {
                 Tingkat Kesulitan: {diffConfig.label}
               </h2>
             </div>
-            <span
-              className={`px-3 py-1 rounded text-xs font-semibold border w-fit ${diffConfig.badgeClass}`}
-            >
+            <span className="px-3 py-1 rounded text-xs font-semibold border border-accent/30 bg-accent/10 text-accent w-fit">
               Standar Wildera
             </span>
           </div>

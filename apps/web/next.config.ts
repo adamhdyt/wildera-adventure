@@ -3,6 +3,15 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   agentRules: false,
   transpilePackages: ['@wildera/ui', '@wildera/types', '@wildera/validation'],
+  async redirects() {
+    return [
+      {
+        source: '/admin/destinasi',
+        destination: '/admin/destinations',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

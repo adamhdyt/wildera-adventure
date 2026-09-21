@@ -27,9 +27,18 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
           {/* Brand Logo */}
           <Link
             href="/"
-            className="pl-2 text-xl font-bold tracking-wider uppercase text-foreground hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2.5 pl-2 hover:opacity-85 transition-opacity"
+            aria-label="Wildera Adventure"
           >
-            Wildera
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.jpg"
+              alt="Wildera Logo"
+              className="w-7 h-7 rounded-md object-cover border border-white/20"
+            />
+            <span className="text-lg font-bold tracking-wider uppercase text-foreground font-display">
+              Wildera
+            </span>
           </Link>
 
           {/* Desktop Nav Links */}
@@ -41,7 +50,7 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
               Explore Trip
             </Link>
             <Link
-              href="/destinasi"
+              href="/gunung"
               className="relative text-sm font-medium text-foreground/90 hover:text-foreground transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-current after:scale-x-0 after:origin-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-left"
             >
               Destinasi
@@ -150,7 +159,7 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
               Explore Trip
             </Link>
             <Link
-              href="/destinasi"
+              href="/gunung"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-lg text-base font-medium text-foreground hover:bg-black/5"
             >

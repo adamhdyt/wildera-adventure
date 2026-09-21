@@ -267,7 +267,7 @@ export function TripCatalogClient({
       </div>
 
       {/* Main Layout: Sidebar + Trip Grid */}
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="catalog-main-layout flex flex-col lg:flex-row gap-8 items-start">
         {/* Desktop Filter Sidebar */}
         <TripFilterSidebar
           filters={filters}
