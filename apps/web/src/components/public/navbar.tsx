@@ -21,9 +21,9 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
     <>
       <nav
         data-section="navbar"
-        className="fixed z-50 top-5 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-6xl"
+        className="fixed z-50 top-5 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-7xl"
       >
-        <div className="flex items-center justify-between p-2 md:px-4 md:py-3 rounded-2xl backdrop-blur-md card border border-white/10 shadow-lg">
+        <div className="flex items-center justify-between p-2 md:px-5 md:py-3 rounded-full backdrop-blur-xl bg-white/80 border border-white/70 shadow-[0_10px_35px_rgba(24,35,31,0.16)]">
           {/* Brand Logo */}
           <Link
             href="/"
@@ -86,7 +86,7 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
                   source: 'navbar_desktop',
                 })
               }
-              className="flex items-center justify-center h-10 px-5 text-sm font-medium rounded-xl cursor-pointer primary-button text-primary-cta-text shadow-sm"
+              className="flex items-center justify-center h-10 px-5 text-sm font-medium rounded-full cursor-pointer primary-button text-primary-cta-text shadow-sm"
             >
               Hubungi WhatsApp
             </a>

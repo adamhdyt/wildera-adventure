@@ -9768,10 +9768,26 @@ h6,
     0 4px 14px 0 rgba(224, 122, 95, 0.15);
 }
 .secondary-button {
-  background: var(--color-secondary-cta, #173357);
-  color: var(--color-secondary-cta-text, #d4e4fa);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  background: var(--color-secondary-cta, #f7f2ea);
+  color: var(--color-secondary-cta-text, #29231f);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 12px rgba(24, 35, 31, 0.14);
+}
+
+[data-section='navbar'] {
+  color: #18231f;
+}
+
+[data-section='navbar'] .primary-button {
+  min-width: 132px;
+  background: #4b2631;
+  color: #fffaf4;
+  border-color: rgba(75, 38, 49, 0.18);
+  box-shadow: 0 5px 14px rgba(75, 38, 49, 0.2);
+}
+
+[data-section='navbar'] a:not(.primary-button):hover {
+  color: #4b2631;
 }
 
 /* Luxuria moves CTA contents, never the hit area. Keep Alpine surfaces. */
