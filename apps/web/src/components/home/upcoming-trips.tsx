@@ -174,7 +174,7 @@ export function UpcomingTrips({ trips }: UpcomingTripsProps) {
               return (
                 <div
                   key={trip.id}
-                  className="flex flex-col h-full card rounded-3xl overflow-hidden group border border-black/5 hover:border-black/15 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1"
+                  className="flex flex-col h-full card rounded-3xl overflow-hidden group border border-black/5 hover:border-black/15 transition-all duration-300 shadow-sm hover:shadow-lg"
                 >
                   {/* Trip Card Image & Badges */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-200">
@@ -260,7 +260,7 @@ export function UpcomingTrips({ trips }: UpcomingTripsProps) {
                       </div>
                       <Link
                         href={`/trip/${trip.slug}`}
-                        className="px-3.5 py-2 text-xs font-semibold rounded-xl primary-button text-primary-cta-text hover:opacity-90 transition-opacity"
+                        className="px-3.5 py-2 text-xs font-semibold rounded-xl primary-button text-primary-cta-text"
                       >
                         Detail
                       </Link>
@@ -275,22 +275,26 @@ export function UpcomingTrips({ trips }: UpcomingTripsProps) {
           <div className="mt-10 flex justify-center">
             <Link
               href="/trip"
-              className="group inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text hover:shadow-md transition-all"
+              className="group inline-flex items-center justify-between gap-3 px-7 py-3 text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text shadow-sm"
             >
-              <span>Lihat Semua Jadwal Trip ({displayTrips.length}+)</span>
-              <svg
-                className="size-4 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
+              <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-2">
+                Lihat Semua Jadwal Trip ({displayTrips.length}+)
+              </span>
+              <div className="size-5 flex items-center justify-center rounded-lg md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 primary-button text-primary-cta-text">
+                <svg
+                  className="size-3 md:transition-opacity md:duration-700 md:group-hover:opacity-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </div>
             </Link>
           </div>
         </div>

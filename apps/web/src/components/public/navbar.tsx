@@ -86,7 +86,7 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
                   source: 'navbar_desktop',
                 })
               }
-              className="flex items-center justify-center h-10 px-5 text-sm font-medium rounded-xl cursor-pointer primary-button text-primary-cta-text hover:opacity-90 transition-opacity shadow-sm"
+              className="flex items-center justify-center h-10 px-5 text-sm font-medium rounded-xl cursor-pointer primary-button text-primary-cta-text shadow-sm"
             >
               Hubungi WhatsApp
             </a>

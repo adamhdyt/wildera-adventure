@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  distDir: process.env.ADMIN_TEST_DATABASE ? '.next/playwright' : '.next',
   transpilePackages: ['@wildera/ui', '@wildera/types', '@wildera/validation'],
   async redirects() {
     return [

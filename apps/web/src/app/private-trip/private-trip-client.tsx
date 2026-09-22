@@ -493,7 +493,7 @@ export function PrivateTripClient({
         <button
           type="submit"
           disabled={loading}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-semibold primary-button text-primary-cta-text hover:opacity-95 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+          className="w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-semibold primary-button text-primary-cta-text disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
         >
           {loading
             ? 'Mengirimkan Permintaan...'

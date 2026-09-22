@@ -41,7 +41,7 @@ export function FinalCta({ whatsappNumber = '6281234567890' }: FinalCtaProps) {
           <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 pt-2">
             <Link
               href="/trip"
-              className="w-full sm:w-auto h-12 px-8 flex items-center justify-center text-sm font-semibold rounded-xl primary-button text-primary-cta-text hover:opacity-95 transition-opacity shadow-lg"
+              className="w-full sm:w-auto h-12 px-8 flex items-center justify-center text-sm font-semibold rounded-xl primary-button text-primary-cta-text shadow-lg"
             >
               Jelajahi Semua Trip
             </Link>
@@ -54,7 +54,7 @@ export function FinalCta({ whatsappNumber = '6281234567890' }: FinalCtaProps) {
                   source: 'final_cta',
                 })
               }
-              className="w-full sm:w-auto h-12 px-8 flex items-center justify-center text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text hover:opacity-95 transition-opacity shadow-sm"
+              className="w-full sm:w-auto h-12 px-8 flex items-center justify-center text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text shadow-sm"
             >
               Konsultasi via WhatsApp
             </a>

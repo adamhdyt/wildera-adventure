@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { trackViewHome } from '@/lib/analytics';
 
 interface HeroSlide {
+  id: string;
   url: string;
   alt: string;
   caption: string;
@@ -12,21 +13,25 @@ interface HeroSlide {
 
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
-    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
+    id: 'rinjani',
+    url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2070&auto=format&fit=crop',
     alt: 'Pemandangan puncak Gunung Rinjani dan Danau Segara Anak',
     caption: 'Gunung Rinjani, Nusa Tenggara Barat',
   },
   {
+    id: 'prau',
     url: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2071&auto=format&fit=crop',
     alt: 'Samudra awan matahari terbit Gunung Prau Dieng',
     caption: 'Gunung Prau, Dataran Tinggi Dieng',
   },
   {
+    id: 'bromo',
     url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
     alt: 'Kaldera dan savana Taman Nasional Bromo Tengger Semeru',
     caption: 'Bromo Tengger Semeru, Jawa Timur',
   },
   {
+    id: 'atap-indonesia',
     url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop',
     alt: 'Gugusan pegunungan dan panorama alam bebas',
     caption: 'Atap Indonesia',
@@ -69,7 +74,7 @@ export function Hero() {
         const isActive = idx === activeIdx;
         return (
           <div
-            key={slide.url}
+            key={slide.id}
             aria-hidden={!isActive}
             className={`absolute inset-0 transition-opacity duration-700 ${
               isActive
@@ -115,14 +120,14 @@ export function Hero() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/trip"
-                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer primary-button text-primary-cta-text hover:opacity-95 transition-all shadow-lg"
+                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer primary-button text-primary-cta-text shadow-lg"
                 >
-                  <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-1">
+                  <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-2">
                     Jelajahi Trip
                   </span>
-                  <div className="size-6 flex items-center justify-center rounded-lg secondary-button text-secondary-cta-text">
+                  <div className="size-5 flex items-center justify-center rounded-lg md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 secondary-button text-secondary-cta-text">
                     <svg
-                      className="size-3.5"
+                      className="size-3 md:transition-opacity md:duration-700 md:group-hover:opacity-0"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
@@ -139,14 +144,14 @@ export function Hero() {
 
                 <Link
                   href="/private-trip"
-                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer secondary-button text-secondary-cta-text hover:opacity-95 transition-all shadow-md"
+                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer secondary-button text-secondary-cta-text shadow-md"
                 >
-                  <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-1">
+                  <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-2">
                     Private Trip
                   </span>
-                  <div className="size-6 flex items-center justify-center rounded-lg primary-button text-primary-cta-text">
+                  <div className="size-5 flex items-center justify-center rounded-lg md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 primary-button text-primary-cta-text">
                     <svg
-                      className="size-3.5"
+                      className="size-3 md:transition-opacity md:duration-700 md:group-hover:opacity-0"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
@@ -181,7 +186,7 @@ export function Hero() {
               const isPast = i < activeIdx;
               return (
                 <button
-                  key={slide.url}
+                  key={slide.id}
                   type="button"
                   aria-label={`Lihat slide ${i + 1}: ${slide.caption}`}
                   onClick={() => setActiveIdx(i)}

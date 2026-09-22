@@ -9754,30 +9754,63 @@ h6,
   box-shadow:
     0 2px 6px 0 rgba(224, 122, 95, 0.25),
     0 4px 14px 0 rgba(224, 122, 95, 0.15);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.primary-button:hover {
-  background: #cb6a50;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px 0 rgba(224, 122, 95, 0.35);
-}
-.primary-button:active {
-  transform: translateY(0);
 }
 .secondary-button {
   background: var(--color-secondary-cta, #173357);
   color: var(--color-secondary-cta-text, #d4e4fa);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.secondary-button:hover {
-  background: #1f4270;
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
+
+/* Luxuria moves CTA contents, never the hit area. Keep Alpine surfaces. */
+:is(a, button, [role='button']):is(.primary-button, .secondary-button) {
+  transform: none;
+  scale: none;
 }
-.secondary-button:active {
-  transform: translateY(0);
+:is(a, button, [role='button']):is(.primary-button, .secondary-button):hover {
+  transform: none;
+}
+:is(a, button, [role='button']):is(.primary-button, .secondary-button):active {
+  transform: none;
+  scale: none;
+}
+:is(a, button, [role='button']):is(.primary-button, .secondary-button):is(
+    :disabled,
+    [aria-disabled='true']
+  ) {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+:is(a, button, [role='button']):is(
+    .primary-button,
+    .secondary-button
+  ):focus-visible {
+  outline: 2px solid var(--color-foreground, #ffffff);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .group:hover *,
+  :is(a, button, [role='button']):is(
+      .primary-button,
+      .secondary-button
+    ).group:hover
+    * {
+    transform: none !important;
+    translate: 0 0 !important;
+    scale: 1 !important;
+    rotate: 0deg !important;
+    opacity: 1 !important;
+  }
 }
 @property --tw-translate-x {
   syntax: '*';

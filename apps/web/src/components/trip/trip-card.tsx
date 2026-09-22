@@ -111,7 +111,7 @@ export function TripCard({ trip }: TripCardProps) {
         <img
           src={coverUrl}
           alt={trip.coverImage?.alt || trip.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 
@@ -229,7 +229,7 @@ export function TripCard({ trip }: TripCardProps) {
 
           <Link
             href={`/trip/${trip.slug}`}
-            className="px-4 py-2 text-xs font-semibold rounded primary-button transition-transform active:scale-95 shrink-0"
+            className="px-4 py-2 text-xs font-semibold rounded primary-button shrink-0"
           >
             Lihat Detail
           </Link>

@@ -108,7 +108,7 @@ export function Destinations({ destinations }: DestinationsProps) {
                 <img
                   src={dest.image}
                   alt={dest.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent group-hover:from-black/90 transition-colors duration-300" />
 

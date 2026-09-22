@@ -65,7 +65,7 @@ export function PrivateTripCta({
             <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto shrink-0">
               <Link
                 href="/private-trip"
-                className="flex items-center justify-center h-12 px-7 text-sm font-semibold rounded-xl primary-button text-primary-cta-text hover:opacity-95 transition-opacity shadow-md text-center"
+                className="flex items-center justify-center h-12 px-7 text-sm font-semibold rounded-xl primary-button text-primary-cta-text shadow-md text-center"
               >
                 Rencanakan Private Trip
               </Link>
@@ -78,7 +78,7 @@ export function PrivateTripCta({
                     source: 'private_trip_cta',
                   })
                 }
-                className="flex items-center justify-center h-12 px-7 text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text hover:opacity-95 transition-opacity shadow-sm text-center"
+                className="flex items-center justify-center h-12 px-7 text-sm font-semibold rounded-xl secondary-button text-secondary-cta-text shadow-sm text-center"
               >
                 Konsultasi WhatsApp
               </a>
