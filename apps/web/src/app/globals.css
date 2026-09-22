@@ -3,24 +3,24 @@
 @source '../../../../../packages/ui/src';
 
 :root {
-  --background: #051424;
-  --foreground: #d4e4fa;
-  --card: #0d1c2d;
-  --card-foreground: #d4e4fa;
-  --primary: #ffffff;
-  --primary-foreground: #0b1e36;
-  --primary-cta: #e07a5f;
+  --background: #ffffff;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --primary: #10254d;
+  --primary-foreground: #ffffff;
+  --primary-cta: #10254d;
   --primary-cta-text: #ffffff;
-  --secondary: #173357;
-  --secondary-foreground: #d4e4fa;
-  --secondary-cta: #173357;
-  --secondary-cta-text: #d4e4fa;
-  --accent: #e07a5f;
+  --secondary: #eef3f7;
+  --secondary-foreground: #10254d;
+  --secondary-cta: #ee8a68;
+  --secondary-cta-text: #ffffff;
+  --accent: #ee8a68;
   --accent-foreground: #ffffff;
-  --background-accent: #122131;
-  --border: #273647;
-  --muted: #173357;
-  --muted-foreground: #94a3b8;
+  --background-accent: #e8eef7;
+  --border: #dbe3ea;
+  --muted: #eef3f7;
+  --muted-foreground: #64748b;
   --radius: 0.5rem;
 }
 
@@ -33,8 +33,8 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
-  background-color: var(--background, #051424);
-  color: var(--foreground, #d4e4fa);
+  background-color: var(--background, #ffffff);
+  color: var(--foreground, #172033);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

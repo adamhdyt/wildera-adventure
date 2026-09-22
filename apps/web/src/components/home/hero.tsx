@@ -120,12 +120,12 @@ export function Hero() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/trip"
-                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer primary-button text-primary-cta-text shadow-lg"
+                  className="group flex items-center justify-between gap-3 h-12 px-5 md:px-6 text-sm font-semibold rounded-full cursor-pointer primary-button text-primary-cta-text shadow-lg"
                 >
                   <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-2">
                     Jelajahi Trip
                   </span>
-                  <div className="size-5 flex items-center justify-center rounded-lg md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 secondary-button text-secondary-cta-text">
+                  <div className="size-7 flex items-center justify-center rounded-full md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 secondary-button text-secondary-cta-text">
                     <svg
                       className="size-3 md:transition-opacity md:duration-700 md:group-hover:opacity-0"
                       fill="none"
@@ -144,12 +144,12 @@ export function Hero() {
 
                 <Link
                   href="/private-trip"
-                  className="group flex items-center justify-between gap-2 h-11 px-6 text-sm font-semibold rounded-xl cursor-pointer secondary-button text-secondary-cta-text shadow-md"
+                  className="group flex items-center justify-between gap-3 h-12 px-5 md:px-6 text-sm font-semibold rounded-full cursor-pointer secondary-button text-secondary-cta-text shadow-md"
                 >
                   <span className="truncate md:transition-transform md:duration-300 md:ease-out md:group-hover:translate-x-2">
                     Private Trip
                   </span>
-                  <div className="size-5 flex items-center justify-center rounded-lg md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 primary-button text-primary-cta-text">
+                  <div className="size-7 flex items-center justify-center rounded-full md:transition-all md:duration-300 md:ease-out md:group-hover:scale-[0.2] md:group-hover:rotate-90 primary-button text-primary-cta-text">
                     <svg
                       className="size-3 md:transition-opacity md:duration-700 md:group-hover:opacity-0"
                       fill="none"

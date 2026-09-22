@@ -84,12 +84,24 @@
     --default-mono-font-family: monospace;
     --radius: var(--radius);
     --color-background: var(--background);
+    --color-background-accent: var(--background-accent);
     --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
     --color-foreground: var(--foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-border: var(--border);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
     --color-primary-cta: var(--primary-cta);
     --color-primary-cta-text: var(--primary-cta-text);
-    --color-secondary-cta: var(--secondary-cta);
-    --color-accent: var(--accent);
+  --color-secondary-cta: var(--secondary-cta);
+  --color-secondary-cta-text: var(--secondary-cta-text);
+  --color-accent: var(--accent);
     --color-background-accent: var(--background-accent);
     --width-content-width: var(--width-content-width);
     --width-carousel-padding: var(--width-carousel-padding);
@@ -9620,12 +9632,12 @@
   --background: #051424;
   --card: #0d1c2d;
   --foreground: #d4e4fa;
-  --primary-cta: #e07a5f;
+  --primary-cta: #10254d;
   --primary-cta-text: #ffffff;
-  --secondary-cta: #173357;
-  --secondary-cta-text: #d4e4fa;
-  --accent: #e07a5f;
-  --background-accent: #122131;
+  --secondary-cta: #ee8a68;
+  --secondary-cta-text: #ffffff;
+  --accent: #ee8a68;
+  --background-accent: #10254d;
   --radius: 0.5rem;
   --width-content-width: clamp(40rem, 78vw, 100rem);
   --vw-1_5: 1.5vw;
@@ -9748,18 +9760,34 @@ h6,
     border-color 0.2s ease;
 }
 .primary-button {
-  background: var(--color-primary-cta, #e07a5f);
-  color: var(--color-primary-cta-text, #ffffff);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #10254d !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 2px 6px 0 rgba(224, 122, 95, 0.25),
-    0 4px 14px 0 rgba(224, 122, 95, 0.15);
+  0 2px 6px 0 rgba(16, 37, 77, 0.28),
+  0 4px 14px 0 rgba(16, 37, 77, 0.18);
 }
 .secondary-button {
-  background: var(--color-secondary-cta, #173357);
-  color: var(--color-secondary-cta-text, #d4e4fa);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  background: #ee8a68 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(238, 138, 104, 0.28);
+}
+
+[data-section='navbar'] {
+  color: #18231f;
+}
+
+[data-section='navbar'] .primary-button {
+  min-width: 132px;
+  background: #4b2631;
+  color: #fffaf4;
+  border-color: rgba(75, 38, 49, 0.18);
+  box-shadow: 0 5px 14px rgba(75, 38, 49, 0.2);
+}
+
+[data-section='navbar'] a:not(.primary-button):hover {
+  color: #4b2631;
 }
 
 /* Luxuria moves CTA contents, never the hit area. Keep Alpine surfaces. */
