@@ -9632,12 +9632,12 @@
   --background: #051424;
   --card: #0d1c2d;
   --foreground: #d4e4fa;
-  --primary-cta: #4b2631;
+  --primary-cta: #10254d;
   --primary-cta-text: #ffffff;
-  --secondary-cta: #e07a5f;
+  --secondary-cta: #ee8a68;
   --secondary-cta-text: #ffffff;
-  --accent: #e07a5f;
-  --background-accent: #122131;
+  --accent: #ee8a68;
+  --background-accent: #10254d;
   --radius: 0.5rem;
   --width-content-width: clamp(40rem, 78vw, 100rem);
   --vw-1_5: 1.5vw;
@@ -9760,18 +9760,18 @@ h6,
     border-color 0.2s ease;
 }
 .primary-button {
-  background: #4b2631 !important;
+  background: #10254d !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-  0 2px 6px 0 rgba(75, 38, 49, 0.28),
-  0 4px 14px 0 rgba(75, 38, 49, 0.18);
+  0 2px 6px 0 rgba(16, 37, 77, 0.28),
+  0 4px 14px 0 rgba(16, 37, 77, 0.18);
 }
 .secondary-button {
-  background: #e07a5f !important;
+  background: #ee8a68 !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.28);
+  box-shadow: 0 4px 12px rgba(238, 138, 104, 0.28);
 }
 
 [data-section='navbar'] {
