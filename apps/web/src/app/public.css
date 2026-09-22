@@ -99,8 +99,9 @@
     --color-accent-foreground: var(--accent-foreground);
     --color-primary-cta: var(--primary-cta);
     --color-primary-cta-text: var(--primary-cta-text);
-    --color-secondary-cta: var(--secondary-cta);
-    --color-accent: var(--accent);
+  --color-secondary-cta: var(--secondary-cta);
+  --color-secondary-cta-text: var(--secondary-cta-text);
+  --color-accent: var(--accent);
     --color-background-accent: var(--background-accent);
     --width-content-width: var(--width-content-width);
     --width-carousel-padding: var(--width-carousel-padding);
