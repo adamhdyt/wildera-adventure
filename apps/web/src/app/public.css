@@ -9632,10 +9632,10 @@
   --background: #051424;
   --card: #0d1c2d;
   --foreground: #d4e4fa;
-  --primary-cta: #e07a5f;
+  --primary-cta: #4b2631;
   --primary-cta-text: #ffffff;
-  --secondary-cta: #173357;
-  --secondary-cta-text: #d4e4fa;
+  --secondary-cta: #e07a5f;
+  --secondary-cta-text: #ffffff;
   --accent: #e07a5f;
   --background-accent: #122131;
   --radius: 0.5rem;
@@ -9760,18 +9760,18 @@ h6,
     border-color 0.2s ease;
 }
 .primary-button {
-  background: var(--color-primary-cta, #e07a5f);
-  color: var(--color-primary-cta-text, #ffffff);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #4b2631 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 2px 6px 0 rgba(224, 122, 95, 0.25),
-    0 4px 14px 0 rgba(224, 122, 95, 0.15);
+  0 2px 6px 0 rgba(75, 38, 49, 0.28),
+  0 4px 14px 0 rgba(75, 38, 49, 0.18);
 }
 .secondary-button {
-  background: var(--color-secondary-cta, #f7f2ea);
-  color: var(--color-secondary-cta-text, #29231f);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 4px 12px rgba(24, 35, 31, 0.14);
+  background: #e07a5f !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.28);
 }
 
 [data-section='navbar'] {
