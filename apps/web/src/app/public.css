@@ -9587,6 +9587,85 @@
     transform: translateY(-50%);
   }
 }
+
+/* Luxuria-inspired public experience: quiet canvas, floating controls, and cinematic motion. */
+html {
+  scroll-behavior: smooth;
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+[data-section='navbar'] {
+  top: 1.25rem;
+  z-index: 1000;
+}
+
+[data-section='navbar'] > div {
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  box-shadow: 0 18px 55px rgb(7 24 58 / 0.12);
+  backdrop-filter: blur(18px);
+  transition: transform 300ms ease, box-shadow 300ms ease, background 300ms ease;
+}
+
+[data-section='navbar'] > div:hover {
+  box-shadow: 0 22px 70px rgb(7 24 58 / 0.18);
+}
+
+main > section:not(:first-child) {
+  position: relative;
+  isolation: isolate;
+}
+
+main > section:not(:first-child)::before {
+  position: absolute;
+  inset: 10% 0 auto;
+  z-index: -1;
+  height: 70%;
+  pointer-events: none;
+  content: '';
+  background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 68%);
+}
+
+.primary-button,
+.secondary-button {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, background-color 300ms ease;
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgb(7 24 58 / 0.2);
+}
+
+img {
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 500ms ease;
+}
+
+section article:hover img,
+section a:hover img {
+  transform: scale(1.045);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 @keyframes floating-move-horizontal {
   0% {
     transform: translateX(-50%) translateY(-10%);

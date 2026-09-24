@@ -23,7 +23,7 @@ const FALLBACK_DESTINATIONS: DestinationCardItem[] = [
     region: 'Lombok, NTB',
     altitude: '3.726 mdpl',
     image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rinjani.jpg?width=1200',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
     slug: 'rinjani',
   },
   {
@@ -43,7 +43,7 @@ const FALLBACK_DESTINATIONS: DestinationCardItem[] = [
     region: 'Lumajang, Jawa Timur',
     altitude: '3.676 mdpl',
     image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=1200',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop',
     slug: 'semeru',
   },
   {
@@ -53,7 +53,7 @@ const FALLBACK_DESTINATIONS: DestinationCardItem[] = [
     region: 'Cianjur, Jawa Barat',
     altitude: '2.958 mdpl',
     image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Gede.jpg?width=1200',
+      'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=1200&auto=format&fit=crop',
     slug: 'gede-pangrango',
   },
 ];

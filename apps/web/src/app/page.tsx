@@ -9,8 +9,8 @@ import { Navbar } from '../components/public/navbar';
 import { Hero } from '../components/home/hero';
 import { UpcomingTrips } from '../components/home/upcoming-trips';
 import { Destinations } from '../components/home/destinations';
-import { WhyWildera } from '../components/home/why-wildera';
 import { HowItWorks } from '../components/home/how-it-works';
+import { WhyWildera } from '../components/home/why-wildera';
 import { PrivateTripCta } from '../components/home/private-trip-cta';
 import { FaqSection } from '../components/home/faq-section';
 import { FinalCta } from '../components/home/final-cta';
@@ -76,11 +76,11 @@ export default async function HomePage() {
         {/* 4. Explore Destinations Section */}
         <Destinations destinations={destinations} />
 
-        {/* 5. Why Wildera Section */}
-        <WhyWildera />
-
-        {/* 6. How It Works Section */}
+        {/* 5. Booking Journey Section */}
         <HowItWorks />
+
+        {/* 6. Why Wildera Section */}
+        <WhyWildera />
 
         {/* 7. Private Trip CTA */}
         <PrivateTripCta whatsappNumber={whatsappNumber} />

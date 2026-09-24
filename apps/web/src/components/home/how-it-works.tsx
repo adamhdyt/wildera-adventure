@@ -38,7 +38,7 @@ export function HowItWorks() {
       shortTitle: 'Berangkat',
       desc: 'Bertemu tim di meeting point yang disepakati, nikmati keindahan alam Indonesia, dan ciptakan momen puncak yang aman bersama Wildera.',
       image:
-        'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop',
+        'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=1200',
     },
   ];
 
