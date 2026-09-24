@@ -16,7 +16,7 @@ const FALLBACK_TRIPS: PublicTripSummary[] = [
     duration: { days: 2, nights: 1 },
     mountain: { name: 'Gunung Prau', slug: 'gunung-prau', altitudeM: 2565 },
     coverImage: {
-      url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Prau.jpg?width=1200',
+      url: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop',
       alt: 'Pemandangan golden sunrise Gunung Prau Dieng',
     },
     nextSchedule: {
@@ -44,7 +44,7 @@ const FALLBACK_TRIPS: PublicTripSummary[] = [
       altitudeM: 3726,
     },
     coverImage: {
-      url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rinjani.jpg?width=1200',
+      url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
       alt: 'Kaldera dan danau kawah Segara Anak Gunung Rinjani',
     },
     nextSchedule: {
@@ -68,7 +68,7 @@ const FALLBACK_TRIPS: PublicTripSummary[] = [
     duration: { days: 3, nights: 2 },
     mountain: { name: 'Gunung Semeru', slug: 'gunung-semeru', altitudeM: 3676 },
     coverImage: {
-      url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=1200',
+      url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop',
       alt: 'Puncak Mahameru dan savana Oro-oro Ombo Semeru',
     },
     nextSchedule: {
@@ -92,7 +92,7 @@ const FALLBACK_TRIPS: PublicTripSummary[] = [
     duration: { days: 2, nights: 1 },
     mountain: { name: 'Gunung Gede', slug: 'gunung-gede', altitudeM: 2958 },
     coverImage: {
-      url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Gede.jpg?width=1200',
+      url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=1200&auto=format&fit=crop',
       alt: 'Alun-alun Surya Kencana bunga edelweiss Gunung Gede',
     },
     nextSchedule: {
@@ -169,7 +169,7 @@ export function UpcomingTrips({ trips }: UpcomingTripsProps) {
               const coverUrl =
                 trip.coverImage?.url && trip.coverImage.url.trim() !== ''
                   ? trip.coverImage.url
-                  : 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Prau.jpg?width=1200';
+                  : 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop';
 
               return (
                 <div
