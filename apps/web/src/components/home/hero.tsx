@@ -14,7 +14,7 @@ interface HeroSlide {
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
     id: 'rinjani',
-    url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2070&auto=format&fit=crop',
+    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rinjani.jpg?width=2070',
     alt: 'Pemandangan puncak Gunung Rinjani dan Danau Segara Anak',
     caption: 'Gunung Rinjani, Nusa Tenggara Barat',
   },
@@ -26,13 +26,13 @@ const DEFAULT_SLIDES: HeroSlide[] = [
   },
   {
     id: 'bromo',
-    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
+    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Bromo.jpg?width=2070',
     alt: 'Kaldera dan savana Taman Nasional Bromo Tengger Semeru',
     caption: 'Bromo Tengger Semeru, Jawa Timur',
   },
   {
     id: 'atap-indonesia',
-    url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop',
+    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=2070',
     alt: 'Gugusan pegunungan dan panorama alam bebas',
     caption: 'Atap Indonesia',
   },

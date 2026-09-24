@@ -33,7 +33,7 @@ const FALLBACK_DESTINATIONS: DestinationCardItem[] = [
     region: 'Wonosobo, Jawa Tengah',
     altitude: '2.565 mdpl',
     image:
-      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop',
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Prau.jpg?width=1200',
     slug: 'prau',
   },
   {
