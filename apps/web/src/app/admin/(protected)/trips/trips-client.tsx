@@ -809,9 +809,31 @@ export function TripsClient({
   const getDifficultyBadge = (diff: DifficultyLevel) => {
     switch (diff) {
       case 'EASY':
-        return <span className="admin-badge badge-published">Mudah</span>;
+        return (
+          <span
+            className="admin-badge"
+            style={{
+              background: '#eff6ff',
+              color: '#1e40af',
+              border: '1px solid #bfdbfe',
+            }}
+          >
+            Mudah
+          </span>
+        );
       case 'MODERATE':
-        return <span className="admin-badge badge-draft">Sedang</span>;
+        return (
+          <span
+            className="admin-badge"
+            style={{
+              background: '#fff7ed',
+              color: '#9a3412',
+              border: '1px solid #fed7aa',
+            }}
+          >
+            Sedang
+          </span>
+        );
       case 'HARD':
         return (
           <span
@@ -842,17 +864,39 @@ export function TripsClient({
   const getTripTypeBadge = (type: TripType) => {
     switch (type) {
       case 'OPEN_TRIP':
-        return <span className="admin-badge badge-draft">Open Trip</span>;
+        return (
+          <span
+            className="admin-badge"
+            style={{
+              background: '#eef2ff',
+              color: '#3730a3',
+              border: '1px solid #c7d2fe',
+            }}
+          >
+            Open Trip
+          </span>
+        );
       case 'PRIVATE_TRIP':
-        return <span className="admin-badge badge-published">Private</span>;
+        return (
+          <span
+            className="admin-badge"
+            style={{
+              background: '#fdf2f8',
+              color: '#9d174d',
+              border: '1px solid #fbcfe8',
+            }}
+          >
+            Private
+          </span>
+        );
       case 'TEKTOK':
         return (
           <span
             className="admin-badge"
             style={{
-              background: '#f0fdf4',
-              color: '#166534',
-              border: '1px solid #bbf7d0',
+              background: '#f8fafc',
+              color: '#334155',
+              border: '1px solid #cbd5e1',
             }}
           >
             Tektok
@@ -863,12 +907,12 @@ export function TripsClient({
           <span
             className="admin-badge"
             style={{
-              background: '#eff6ff',
-              color: '#1e40af',
-              border: '1px solid #bfdbfe',
+              background: '#f0fdf4',
+              color: '#166534',
+              border: '1px solid #bbf7d0',
             }}
           >
-            Ekspedisi
+            Multi-Day
           </span>
         );
       default:
@@ -892,7 +936,7 @@ export function TripsClient({
         {canManage && (
           <button
             type="button"
-            className="admin-btn admin-btn-primary"
+            className="admin-btn-accent"
             onClick={openCreateModal}
           >
             + Tambah Trip
@@ -1175,8 +1219,8 @@ export function TripsClient({
                           style={{
                             padding: '0.35rem 0.65rem',
                             marginRight: '0.4rem',
-                            background: '#059669',
-                            borderColor: '#059669',
+                            background: 'var(--accent)',
+                            borderColor: 'var(--accent)',
                           }}
                           disabled={actionLoadingId === item.id}
                           onClick={() => handlePublish(item)}
@@ -1334,13 +1378,13 @@ export function TripsClient({
                       background: 'none',
                       borderBottom:
                         activeContentTab === 'itineraries'
-                          ? '2px solid #1b4332'
+                          ? '2px solid #10254d'
                           : '2px solid transparent',
                       fontWeight:
                         activeContentTab === 'itineraries' ? 600 : 400,
                       color:
                         activeContentTab === 'itineraries'
-                          ? '#1b4332'
+                          ? '#10254d'
                           : '#6b7280',
                       cursor: 'pointer',
                     }}
@@ -1356,12 +1400,12 @@ export function TripsClient({
                       background: 'none',
                       borderBottom:
                         activeContentTab === 'facilities'
-                          ? '2px solid #1b4332'
+                          ? '2px solid #10254d'
                           : '2px solid transparent',
                       fontWeight: activeContentTab === 'facilities' ? 600 : 400,
                       color:
                         activeContentTab === 'facilities'
-                          ? '#1b4332'
+                          ? '#10254d'
                           : '#6b7280',
                       cursor: 'pointer',
                     }}
@@ -1377,15 +1421,15 @@ export function TripsClient({
                       background: 'none',
                       borderBottom:
                         activeContentTab === 'gears'
-                          ? '2px solid #1b4332'
+                          ? '2px solid #10254d'
                           : '2px solid transparent',
                       fontWeight: activeContentTab === 'gears' ? 600 : 400,
                       color:
-                        activeContentTab === 'gears' ? '#1b4332' : '#6b7280',
+                        activeContentTab === 'gears' ? '#10254d' : '#6b7280',
                       cursor: 'pointer',
                     }}
                   >
-                    🥾 Perlengkapan ({gears.length})
+                    🧗 Gear ({gears.length})
                   </button>
                   <button
                     type="button"
@@ -1396,11 +1440,11 @@ export function TripsClient({
                       background: 'none',
                       borderBottom:
                         activeContentTab === 'faqs'
-                          ? '2px solid #1b4332'
+                          ? '2px solid #10254d'
                           : '2px solid transparent',
                       fontWeight: activeContentTab === 'faqs' ? 600 : 400,
                       color:
-                        activeContentTab === 'faqs' ? '#1b4332' : '#6b7280',
+                        activeContentTab === 'faqs' ? '#10254d' : '#6b7280',
                       cursor: 'pointer',
                     }}
                   >
@@ -1415,11 +1459,11 @@ export function TripsClient({
                       background: 'none',
                       borderBottom:
                         activeContentTab === 'media'
-                          ? '2px solid #1b4332'
+                          ? '2px solid #10254d'
                           : '2px solid transparent',
                       fontWeight: activeContentTab === 'media' ? 600 : 400,
                       color:
-                        activeContentTab === 'media' ? '#1b4332' : '#6b7280',
+                        activeContentTab === 'media' ? '#10254d' : '#6b7280',
                       cursor: 'pointer',
                     }}
                   >
@@ -1498,7 +1542,7 @@ export function TripsClient({
                                 style={{
                                   fontWeight: 600,
                                   fontSize: '0.9rem',
-                                  color: '#1b4332',
+                                  color: '#10254d',
                                 }}
                               >
                                 Hari ke-{it.dayNumber}
@@ -1618,7 +1662,7 @@ export function TripsClient({
                           style={{
                             padding: '0.35rem 0.75rem',
                             fontSize: '0.85rem',
-                            background: '#166534',
+                            background: '#10254d',
                           }}
                           onClick={() => addFacility('INCLUDE')}
                         >
@@ -2081,7 +2125,7 @@ export function TripsClient({
                               height: '80px',
                               borderRadius: '4px',
                               overflow: 'hidden',
-                              background: '#1b4332',
+                              background: '#10254d',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',

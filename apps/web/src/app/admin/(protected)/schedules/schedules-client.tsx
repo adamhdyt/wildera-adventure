@@ -2038,7 +2038,7 @@ export function SchedulesClient({
                           )}
                         </td>
                         <td>
-                          <span style={{ fontWeight: 600, color: '#15803d' }}>
+                          <span style={{ fontWeight: 600, color: '#10254d' }}>
                             Rp {Number(pkg.price).toLocaleString('id-ID')}
                           </span>
                         </td>
@@ -2282,7 +2282,7 @@ export function SchedulesClient({
                       <div
                         style={{
                           fontSize: '0.75rem',
-                          color: '#166534',
+                          color: '#10254d',
                           fontWeight: 600,
                         }}
                       >
@@ -2292,7 +2292,7 @@ export function SchedulesClient({
                         style={{
                           fontSize: '1.25rem',
                           fontWeight: 700,
-                          color: '#15803d',
+                          color: '#10254d',
                           marginTop: '2px',
                         }}
                       >
@@ -2301,7 +2301,7 @@ export function SchedulesClient({
                       <div
                         style={{
                           fontSize: '0.75rem',
-                          color: '#166534',
+                          color: '#10254d',
                           fontWeight: 500,
                           marginTop: '2px',
                         }}

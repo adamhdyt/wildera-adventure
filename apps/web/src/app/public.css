@@ -99,9 +99,9 @@
     --color-accent-foreground: var(--accent-foreground);
     --color-primary-cta: var(--primary-cta);
     --color-primary-cta-text: var(--primary-cta-text);
-  --color-secondary-cta: var(--secondary-cta);
-  --color-secondary-cta-text: var(--secondary-cta-text);
-  --color-accent: var(--accent);
+    --color-secondary-cta: var(--secondary-cta);
+    --color-secondary-cta-text: var(--secondary-cta-text);
+    --color-accent: var(--accent);
     --color-background-accent: var(--background-accent);
     --width-content-width: var(--width-content-width);
     --width-carousel-padding: var(--width-carousel-padding);
@@ -9634,9 +9634,9 @@
   --foreground: #d4e4fa;
   --primary-cta: #10254d;
   --primary-cta-text: #ffffff;
-  --secondary-cta: #ee8a68;
+  --secondary-cta: #e73f1e;
   --secondary-cta-text: #ffffff;
-  --accent: #ee8a68;
+  --accent: #e73f1e;
   --background-accent: #10254d;
   --radius: 0.5rem;
   --width-content-width: clamp(40rem, 78vw, 100rem);
@@ -9764,14 +9764,14 @@ h6,
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-  0 2px 6px 0 rgba(16, 37, 77, 0.28),
-  0 4px 14px 0 rgba(16, 37, 77, 0.18);
+    0 2px 6px 0 rgba(16, 37, 77, 0.28),
+    0 4px 14px 0 rgba(16, 37, 77, 0.18);
 }
 .secondary-button {
-  background: #ee8a68 !important;
+  background: #e73f1e !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(238, 138, 104, 0.28);
+  box-shadow: 0 4px 12px rgba(231, 63, 30, 0.28);
 }
 
 [data-section='navbar'] {

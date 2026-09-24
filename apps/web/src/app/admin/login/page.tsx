@@ -7,7 +7,11 @@ export default async function LoginPage() {
   return (
     <main className="admin-login">
       <div className="login-intro">
-        <p className="admin-brand">Wildera Adventure</p>
+        <p className="admin-brand">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.jpg" alt="Wildera Logo" />
+          <span>Wildera Adventure</span>
+        </p>
         <p className="login-context">Ruang kerja admin</p>
         <h1>
           Persiapan perjalanan

@@ -60,7 +60,11 @@ export function AdminShell({
       <aside className="admin-sidebar">
         <div className="sidebar-heading">
           <a href="/admin/dashboard" className="admin-brand">
-            Wildera<span>Adventure · Admin</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.jpg" alt="Wildera Logo" />
+            <div>
+              Wildera<span>Adventure · Admin</span>
+            </div>
           </a>
           <button
             ref={menuButton}

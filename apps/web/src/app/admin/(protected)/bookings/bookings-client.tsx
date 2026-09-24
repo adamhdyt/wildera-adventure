@@ -1142,8 +1142,8 @@ export function BookingsClient({
                             disabled={actionLoading}
                             onClick={() => handleConfirm(item)}
                             style={{
-                              background: '#166534',
-                              borderColor: '#166534',
+                              background: '#10254d',
+                              borderColor: '#10254d',
                             }}
                           >
                             Konfirmasi
@@ -1618,8 +1618,8 @@ export function BookingsClient({
                     disabled={actionLoading}
                     onClick={() => handleConfirm(selectedBooking)}
                     style={{
-                      background: '#166534',
-                      borderColor: '#166534',
+                      background: '#10254d',
+                      borderColor: '#10254d',
                     }}
                   >
                     Konfirmasi Booking Sekarang

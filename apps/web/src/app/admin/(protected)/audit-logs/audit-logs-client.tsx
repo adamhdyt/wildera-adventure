@@ -250,7 +250,7 @@ export function AuditLogsClient({
               placeholder="Cari aksi, aktor, atau entitas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#10254d] focus:outline-none focus:ring-1 focus:ring-[#10254d]"
             />
           </div>
 
@@ -262,7 +262,7 @@ export function AuditLogsClient({
             <select
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#10254d] focus:outline-none focus:ring-1 focus:ring-[#10254d]"
             >
               {COMMON_ACTIONS.map((a) => (
                 <option key={a.value} value={a.value}>
@@ -280,7 +280,7 @@ export function AuditLogsClient({
             <select
               value={selectedEntity}
               onChange={(e) => setSelectedEntity(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#10254d] focus:outline-none focus:ring-1 focus:ring-[#10254d]"
             >
               {COMMON_ENTITIES.map((ent) => (
                 <option key={ent.value} value={ent.value}>
@@ -299,7 +299,7 @@ export function AuditLogsClient({
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#10254d] focus:outline-none focus:ring-1 focus:ring-[#10254d]"
             />
           </div>
 
@@ -312,7 +312,7 @@ export function AuditLogsClient({
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-[#10254d] focus:outline-none focus:ring-1 focus:ring-[#10254d]"
             />
           </div>
         </div>
@@ -328,7 +328,7 @@ export function AuditLogsClient({
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center rounded-md bg-emerald-600 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50"
+            className="inline-flex items-center rounded-md bg-[#10254d] px-3.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-[#0a1833] focus:outline-none focus:ring-2 focus:ring-[#10254d] focus:ring-offset-2 disabled:opacity-50"
           >
             {isPending ? 'Memuat...' : 'Terapkan Filter'}
           </button>

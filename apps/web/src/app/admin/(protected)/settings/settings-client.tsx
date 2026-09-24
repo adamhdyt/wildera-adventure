@@ -213,7 +213,7 @@ export function SettingsClient({
                   })
                 }
                 placeholder="6281234567890"
-                className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-stone-100 disabled:text-stone-500"
+                className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#10254d] disabled:bg-stone-100 disabled:text-stone-500"
               />
               <p className="text-[11px] text-stone-500 mt-1">
                 Format: 628... Digunakan untuk seluruh tombol WhatsApp di
@@ -245,7 +245,7 @@ export function SettingsClient({
                   })
                 }
                 placeholder="info@wildera.id"
-                className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-stone-100 disabled:text-stone-500"
+                className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#10254d] disabled:bg-stone-100 disabled:text-stone-500"
               />
               <p className="text-[11px] text-stone-500 mt-1">
                 Ditampilkan pada footer dan korespondensi resmi customer
@@ -290,7 +290,7 @@ export function SettingsClient({
                 })
               }
               placeholder="https://instagram.com/wildera.adventure"
-              className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-stone-100 disabled:text-stone-500"
+              className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#10254d] disabled:bg-stone-100 disabled:text-stone-500"
             />
             <p className="text-[11px] text-stone-500 mt-1">
               Contoh: https://instagram.com/wildera.adventure
@@ -337,7 +337,7 @@ export function SettingsClient({
                   })
                 }
                 placeholder="20"
-                className="w-28 px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-stone-100 disabled:text-stone-500"
+                className="w-28 px-3.5 py-2 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#10254d] disabled:bg-stone-100 disabled:text-stone-500"
               />
               <span className="text-sm font-semibold text-stone-600">%</span>
             </div>
@@ -374,7 +374,7 @@ export function SettingsClient({
           <button
             type="submit"
             disabled={!canManage || loading}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+            className="px-6 py-2.5 bg-[#10254d] hover:bg-[#0a1833] disabled:bg-stone-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
           >
             {loading ? 'Menyimpan...' : 'Simpan Pengaturan'}
           </button>

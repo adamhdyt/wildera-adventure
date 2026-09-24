@@ -74,30 +74,45 @@ export default async function AdminSectionPage({
       </div>
 
       {slug === 'dashboard' ? (
-        <div className="dashboard-overview" style={{ marginTop: '2rem' }}>
+        <div className="dashboard-overview" style={{ marginTop: '1.5rem' }}>
           <div className="admin-metrics-grid">
-            <div className="metric-card">
-              <span className="metric-title">Paket Trip</span>
+            <a href="/admin/trips" className="metric-card">
+              <div className="metric-header">
+                <span className="metric-title">Paket Trip</span>
+                <span className="metric-badge">Katalog</span>
+              </div>
               <span className="metric-value">{tripCount}</span>
               <span className="metric-subtext">Trip gunung terpublikasi</span>
-            </div>
-            <div className="metric-card">
-              <span className="metric-title">Jadwal Keberangkatan</span>
+            </a>
+            <a href="/admin/schedules" className="metric-card">
+              <div className="metric-header">
+                <span className="metric-title">Jadwal Keberangkatan</span>
+                <span className="metric-badge">Operasional</span>
+              </div>
               <span className="metric-value">{scheduleCount}</span>
               <span className="metric-subtext">Jadwal dengan kuota aktif</span>
-            </div>
-            <div className="metric-card">
-              <span className="metric-title">Total Booking</span>
+            </a>
+            <a href="/admin/bookings" className="metric-card accent-orange">
+              <div className="metric-header">
+                <span className="metric-title">Total Booking</span>
+                <span className="metric-badge badge-orange">Konversi</span>
+              </div>
               <span className="metric-value">{bookingCount}</span>
               <span className="metric-subtext">
                 Pesanan terdaftar di sistem
               </span>
-            </div>
-            <div className="metric-card">
-              <span className="metric-title">Inquiry Private Trip</span>
+            </a>
+            <a
+              href="/admin/private-trips"
+              className="metric-card accent-orange"
+            >
+              <div className="metric-header">
+                <span className="metric-title">Inquiry Private</span>
+                <span className="metric-badge badge-orange">Kustom</span>
+              </div>
               <span className="metric-value">{inquiryCount}</span>
               <span className="metric-subtext">Pengajuan kustom menunggu</span>
-            </div>
+            </a>
           </div>
 
           <div>
@@ -137,35 +152,22 @@ export default async function AdminSectionPage({
                 </p>
                 <span className="action-card-link">Tinjau Inquiry →</span>
               </a>
-              <div className="action-card" style={{ opacity: 0.85 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <h3>Laporan Analitik</h3>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--muted, #64748b)',
-                    }}
-                  >
-                    Belum tersedia
-                  </span>
-                </div>
+              <a href="/admin/settings" className="action-card">
+                <h3>Pengaturan Situs</h3>
                 <p>
-                  Rekonsiliasi transaksi pembayaran dan metrik konversi
-                  otomatis.
+                  Atur nomor WhatsApp resmi, email operasional, dan parameter
+                  sistem.
                 </p>
-                <span
-                  className="action-card-link"
-                  style={{ color: 'var(--muted, #64748b)' }}
-                >
-                  Segera hadir
-                </span>
-              </div>
+                <span className="action-card-link">Buka Pengaturan →</span>
+              </a>
+              <a href="/admin/audit-logs" className="action-card">
+                <h3>Audit Logs</h3>
+                <p>
+                  Pantau rekam jejak aktivitas staf, mutasi data, dan kepatuhan
+                  keamanan.
+                </p>
+                <span className="action-card-link">Lihat Log Audit →</span>
+              </a>
             </div>
           </div>
         </div>
