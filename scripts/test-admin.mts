@@ -29,11 +29,15 @@ try {
     stdio: 'inherit',
   });
   if (migration.status !== 0) throw new Error('Test migration failed');
-  const result = spawnSync('npx', ['playwright', 'test'], {
-    cwd: resolve(root, 'apps/web'),
-    env,
-    stdio: 'inherit',
-  });
+  const result = spawnSync(
+    'npx',
+    ['playwright', 'test', ...process.argv.slice(2)],
+    {
+      cwd: resolve(root, 'apps/web'),
+      env,
+      stdio: 'inherit',
+    },
+  );
   process.exitCode = result.status ?? 1;
 } finally {
   await admin.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);

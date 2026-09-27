@@ -101,7 +101,7 @@ catch (error) { console.error(error); process.exitCode = 1; }`,
   }
 });
 
-test('launch stays blocked when file-only checks exist and all subprocesses pass', () => {
+test('launch rejects missing browser evidence even when all subprocesses exit zero', () => {
   const launchUrl = new URL('./final-launch-check.mts', import.meta.url).href;
   const result = spawnSync(
     process.execPath,
@@ -118,9 +118,13 @@ await import(${JSON.stringify(launchUrl)});
     ],
     { env: {}, encoding: 'utf8' },
   );
-  assert.equal(result.status, 1, 'file existence cannot approve launch');
+  assert.equal(
+    result.status,
+    1,
+    'missing browser report cannot approve launch',
+  );
   for (const name of ['Mobile UX', 'SEO & Meta Tags', 'Legal Pages']) {
-    assert.ok(result.stdout.includes(`[UNVERIFIED] ${name}`));
+    assert.ok(result.stdout.includes(`[FAIL] ${name}`));
   }
   assert.match(result.stdout, /\[PASS\] RBAC Permissions/);
   assert.doesNotMatch(result.stdout, /Argon2id hashing|STEP 42 APPROVED/);

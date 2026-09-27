@@ -111,7 +111,7 @@ export function Navbar({ whatsappNumber = '6281234567890' }: NavbarProps) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-foreground hover:bg-black/5 transition-colors"
+              className="p-2.5 rounded-lg text-foreground hover:bg-black/5 transition-colors"
               aria-label="Menu navigasi"
               aria-expanded={mobileMenuOpen}
             >

@@ -1,37 +1,44 @@
 # Report STEP 41 — Final Launch Check
 
-## Status: BLOCKED FOR LAUNCH
+## Status: BLOCKED FOR PRODUCTION; browser scope verified
 
-Klaim sebelumnya bahwa seluruh 11 kriteria PASS dan STEP 42 disetujui ditarik. Keberadaan berkas bukan bukti perilaku aplikasi. `scripts/final-launch-check.mts` kini menandai pemeriksaan berkas mobile, SEO, dan legal sebagai **UNVERIFIED**, bukan PASS. Status selain PASS memblokir approval dengan exit code 1.
+Verifikasi lokal 27 September 2026: mobile, SEO, dan legal sekarang diuji pada Chromium dengan API nyata dan database PostgreSQL ephemeral. Bukan PASS berdasarkan keberadaan berkas. STEP 42 belum dimulai/disetujui; hosting/domain produksi belum ditentukan.
 
-## Cakupan aktual harness
+## Bukti eksekusi
 
-| Pemeriksaan               | Bukti yang diperiksa                                                 | Batas cakupan                                                                                          |
-| ------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| RBAC Permissions          | `test/authorization.test.ts`: pemetaan role ke permission            | Bukan pengujian login, Argon2id, cookie, atau session guard. Admin Auth belum dibuktikan oleh tes ini. |
-| Capacity Concurrency      | `test/database/booking-concurrency.test.ts`                          | Perlu eksekusi pada database uji terisolasi.                                                           |
-| Booking System            | `test/database/booking.test.ts`                                      | Tes backend; bukan bukti alur browser end-to-end.                                                      |
-| WhatsApp Conversion       | `test/whatsapp-conversion.test.ts`                                   | Utilitas konversi/link; bukan bukti pengiriman pesan.                                                  |
-| Mobile UX                 | Keberadaan empat berkas komponen                                     | **UNVERIFIED**: layout, interaksi, dan touch target perlu pengujian browser.                           |
-| Private Trip              | `test/database/private-trip.test.ts`                                 | Tes backend; bukan bukti frontend hingga admin end-to-end.                                             |
-| SEO & Meta Tags           | Keberadaan `sitemap.ts` dan `robots.ts`                              | **UNVERIFIED**: respons route, canonical, OpenGraph, dan structured data belum diperiksa.              |
-| Analytics Engine          | `test/analytics-validation.test.ts`                                  | Validasi payload; bukan bukti integrasi tracking browser/produksi.                                     |
-| Database Backup           | Menjalankan script backup, memeriksa berkas nonkosong                | Bukan validasi checksum, isi archive, atau restore.                                                    |
-| Sensitive Data Protection | `test/security.test.ts`                                              | Cakupan tes tersebut; bukan audit keamanan produksi menyeluruh.                                        |
-| Legal Pages               | Keberadaan berkas safety, terms, cancellation, privacy, FAQ, tentang | **UNVERIFIED**: lookup konten published, respons render, dan persetujuan kebijakan belum diperiksa.    |
+| Perintah                                                                                      | Hasil                                                          |
+| --------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `npm run test:admin -- launch.spec.ts seo.spec.ts content-pages.spec.ts trip-catalog.spec.ts` | **24 passed**, 32.5s, exit 0                                   |
+| `npm run test:launch`                                                                         | **10/12 PASS**, 2 UNVERIFIED, exit 1 (gate memblokir produksi) |
+| `npm test`                                                                                    | **136 passed**, 0 failed                                       |
+| `npm run lint`                                                                                | exit 0                                                         |
+| `npm run typecheck`                                                                           | exit 0                                                         |
+| `node --test scripts/launch-blockers.test.mts scripts/launch-browser-gate.test.mts`           | **7 passed**, 0 failed                                         |
 
-## Verifikasi koreksi precommit
+Harness launch menjalankan 9 tes browser baru dan tes API RBAC, concurrency booking, lifecycle booking, private trip, WhatsApp, analytics, dan security. Mobile/SEO/legal mendapat PASS hanya jika laporan JSON baru menunjukkan tepat 9 expected, tanpa unexpected/skipped/flaky, serta subprocess exit 0. Laporan hilang atau subprocess gagal tetap FAIL. Tes gate memakai mock subprocess hanya untuk menguji fail-closed, bukan sebagai bukti aplikasi.
 
-`node --test scripts/launch-blockers.test.mts` menyediakan regresi terisolasi:
+## Cakupan browser
 
-- Backup memakai `pg_dump` palsu dalam direktori sementara: tanpa shell expansion, kredensial lewat `PGDATABASE` bukan argv, kegagalan subprocess/URL tidak menampilkan kredensial.
-- Semua subprocess launch dimock sukses; mobile/SEO/legal tetap UNVERIFIED dan launch tetap diblokir. Ini pengujian gate, **bukan** hasil launch check nyata.
-- Pemeriksaan statis memastikan page key seed baru cocok dengan lookup publik `privacy`, `terms`, `cancellation`, `safety`; seed tidak dijalankan.
+- Mobile 360×844 dan 390×844: menu buka/navigasi/tutup, target menu minimal 44×44px, filter Open Trip benar-benar menghapus kartu Private Trip API, reset mengembalikan kartu, tidak ada horizontal overflow pada home/catalog/filter/detail.
+- Perbaikan UI: target hamburger sebelumnya 40×40px, kini 44×44px lewat padding. Assertion ukuran dibuktikan gagal sebelum perbaikan.
+- SEO: canonical, OpenGraph URL, description dan robots pada 12 route publik; sitemap memuat trip/gunung published dari DB; draft tidak masuk sitemap, API draft 404, detail draft noindex, admin noindex/nofollow/nocache.
+- Legal: terms/privacy/cancellation/safety/about memakai page key dengan slug berbeda, konten unik DB terlihat pada API dan artikel browser. Perubahan status DRAFT menghasilkan API 404 dan konten draft tidak bocor ke halaman. FAQ published tampil, accordion tutup/buka dan search bekerja, draft disembunyikan. Tentang memakai key `about` dan route `/tentang`.
+- Suite lama SEO/content/catalog tetap dijalankan; sebagian memakai fallback. Bukti API-backed berasal dari suite `launch.spec.ts`, bukan dari fallback.
 
-Full `npm run test:launch`, seed, tes database, dan backup database nyata **tidak dijalankan dalam koreksi ini**. Harness nyata memuat `.env` dan menjalankan operasi database; jalankan hanya pada lingkungan uji yang disetujui. Tidak ada approval produksi dari hasil regresi terisolasi.
+## Isolasi dan perubahan harness
 
-## Catatan seed dan tindak lanjut
+`test-admin.mts` meneruskan argumen Playwright untuk memilih suite. Database `wildera_admin_test_<uuid>` dibuat, dimigrasikan, lalu dihapus dalam finally. Fixture hanya ditulis setelah guard nama DB cocok. Server tes memakai port 3100/3101 dan distDir `.next/playwright`; server development 3000/3001 tidak dihentikan. Tidak menjalankan development seed/reset, deployment, commit, atau push. Konfigurasi runtime dimuat oleh harness existing; nilai secret tidak dibaca ke percakapan atau dicetak.
 
-Slug legal tetap. Koreksi page key berlaku untuk seed baru, bukan migrasi data lama. `pageKey` dan `slug` sama-sama unik; database yang sudah memiliki key lama dengan slug sama memerlukan migrasi eksplisit yang menjaga konten setelah pemeriksaan konflik. Jangan menganggap menjalankan ulang seed sebagai migrasi aman.
+Backup development tidak lagi dijalankan otomatis oleh launch harness. Keberadaan archive tidak membuktikan restore; kategori Backup tetap UNVERIFIED sampai drill backup/restore terpisah disetujui dan dibuktikan.
 
-Sebelum approval: buktikan autentikasi/sesi, jalankan tes integrasi pada DB terisolasi, lakukan browser QA mobile, periksa output SEO dan konten legal published, dapatkan persetujuan pemilik kebijakan, serta uji backup/restore nyata. **STEP 42 belum disetujui.**
+## Batas dan blocker produksi
+
+- Backup/restore nyata belum dibuktikan sesi ini.
+- Persetujuan pemilik kebijakan, audit konten produksi dan keputusan hosting/domain belum tersedia. Browser membuktikan rendering, bukan akurasi hukum.
+- RBAC unit bukan autentikasi/sesi lengkap. Lifecycle API melakukan login, tetapi audit sesi dan full admin E2E bukan cakupan sesi ini.
+- Canonical memakai default `https://wildera.id`; kecocokan terhadap domain deployment dan konfigurasi custom origin belum dibuktikan.
+- Halaman trip masih memiliki fallback demo ketika API tidak menyediakan data; roadmap melarang peluncuran dummy data. Audit/removal fallback produksi perlu tindak lanjut, tidak disamarkan sebagai launch-ready.
+- Chromium viewport bukan perangkat fisik, Safari/Firefox, audit aksesibilitas menyeluruh, tracking produksi, atau bukti pengiriman WhatsApp.
+- Tidak menjalankan build produksi karena server development aktif dan build normal berbagi `.next`. Quality gates sesi ini lint/typecheck/unit/browser, bukan production-build approval.
+
+Page key seed baru tetap cocok dengan lookup legal. Data lama dengan key berbeda memerlukan migrasi eksplisit yang menjaga konten setelah pemeriksaan konflik, bukan reseed development.

@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -142,33 +143,41 @@ if (waCheck.status === 0) {
   });
 }
 
-// 5. Mobile UX & Responsive Components
-console.log('[5/11] Checking Mobile UX & Responsive Layouts...');
-const responsiveFiles = [
-  'apps/web/src/components/public/navbar.tsx',
-  'apps/web/src/components/public/footer.tsx',
-  'apps/web/src/components/trip/trip-filter-bottom-sheet.tsx',
-  'apps/web/src/components/trip-detail/booking-card.tsx',
-];
-const allResponsiveExist = responsiveFiles.every((f) =>
-  existsSync(resolve(root, f)),
-);
-if (allResponsiveExist) {
-  results.push({
-    name: 'Mobile UX',
-    category: 'Public UX',
-    status: 'UNVERIFIED',
-    details:
-      'Component files exist only; responsive behavior and touch targets require browser verification.',
-  });
-} else {
-  results.push({
-    name: 'Mobile UX',
-    category: 'Public UX',
-    status: 'FAIL',
-    details: 'Some responsive components missing.',
-  });
+// One isolated browser run, fresh report; exit zero alone is insufficient.
+console.log('[5/11] Checking Mobile, SEO and Legal in Chromium...');
+const reportDir = mkdtempSync(resolve(tmpdir(), 'wildera-launch-'));
+let browserPassed = false;
+try {
+  const reportPath = resolve(reportDir, 'browser.json');
+  const browser = runCommand(
+    'node',
+    ['scripts/test-admin.mts', 'launch.spec.ts', '--reporter=json'],
+    {
+      PLAYWRIGHT_JSON_OUTPUT_NAME: reportPath,
+    },
+  );
+  try {
+    const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+    browserPassed =
+      browser.status === 0 &&
+      report.stats.expected === 9 &&
+      report.stats.unexpected === 0 &&
+      report.stats.skipped === 0 &&
+      report.stats.flaky === 0;
+  } catch {
+    browserPassed = false;
+  }
+  if (!browserPassed) console.error(browser.stdout, browser.stderr);
+} finally {
+  rmSync(reportDir, { recursive: true, force: true });
 }
+results.push({
+  name: 'Mobile UX',
+  category: 'Public UX',
+  status: browserPassed ? 'PASS' : 'FAIL',
+  details:
+    'Isolated Chromium: 360/390px menu navigation, API catalog filter/reset, detail and horizontal overflow. Not a device accessibility audit.',
+});
 
 // 6. Private Trip
 console.log('[6/11] Checking Private Trip Pipeline...');
@@ -191,25 +200,13 @@ if (privateTripCheck.status === 0) {
 }
 
 // 7. SEO
-console.log('[7/11] Checking SEO & Indexing Assets...');
-const seoFiles = ['apps/web/src/app/sitemap.ts', 'apps/web/src/app/robots.ts'];
-const allSeoExist = seoFiles.every((f) => existsSync(resolve(root, f)));
-if (allSeoExist) {
-  results.push({
-    name: 'SEO & Meta Tags',
-    category: 'Marketing',
-    status: 'UNVERIFIED',
-    details:
-      'Route files exist only; rendered sitemap, robots, canonical and OpenGraph output unverified.',
-  });
-} else {
-  results.push({
-    name: 'SEO & Meta Tags',
-    category: 'Marketing',
-    status: 'FAIL',
-    details: 'Missing SEO route files.',
-  });
-}
+results.push({
+  name: 'SEO & Meta Tags',
+  category: 'Marketing',
+  status: browserPassed ? 'PASS' : 'FAIL',
+  details:
+    'Rendered canonical/OG/robots and sitemap, API-published dynamic routes and draft exclusion at configured default origin. Production domain not verified.',
+});
 
 // 8. Analytics & PII Protection
 console.log('[8/11] Checking Analytics & PII Stripping...');
@@ -230,30 +227,14 @@ if (analyticsCheck.status === 0) {
   });
 }
 
-// 9. Database Backup
-console.log('[9/11] Checking Database Backup Script...');
-const backupCheck = runCommand('node', [
-  '--env-file=.env',
-  '--loader',
-  'ts-node/esm',
-  'scripts/backup-database.mts',
-]);
-if (backupCheck.status === 0) {
-  results.push({
-    name: 'Database Backup',
-    category: 'Reliability',
-    status: 'PASS',
-    details:
-      'Compressed PostgreSQL archive creation and retention rotation verified.',
-  });
-} else {
-  results.push({
-    name: 'Database Backup',
-    category: 'Reliability',
-    status: 'FAIL',
-    details: backupCheck.stderr || backupCheck.stdout,
-  });
-}
+// 9. Backup is operational evidence, not an implicit development DB action.
+results.push({
+  name: 'Database Backup',
+  category: 'Reliability',
+  status: 'UNVERIFIED',
+  details:
+    'No backup/restore executed by this harness. Run an approved isolated backup and restore drill; archive existence alone does not verify recovery.',
+});
 
 // 10. Sensitive Data Protection
 console.log('[10/11] Checking Sensitive Data Protection & Headers...');
@@ -275,33 +256,21 @@ if (securityCheck.status === 0) {
   });
 }
 
-// 11. Legal Pages
-console.log('[11/11] Checking Legal & Policy Pages...');
-const legalRoutes = [
-  'apps/web/src/app/safety/page.tsx',
-  'apps/web/src/app/terms/page.tsx',
-  'apps/web/src/app/cancellation/page.tsx',
-  'apps/web/src/app/privacy/page.tsx',
-  'apps/web/src/app/faq/page.tsx',
-  'apps/web/src/app/tentang/page.tsx',
-];
-const allLegalExist = legalRoutes.every((f) => existsSync(resolve(root, f)));
-if (allLegalExist) {
-  results.push({
-    name: 'Legal Pages',
-    category: 'Compliance',
-    status: 'UNVERIFIED',
-    details:
-      'Route files exist only; published content lookup, rendered pages and policy accuracy unverified.',
-  });
-} else {
-  results.push({
-    name: 'Legal Pages',
-    category: 'Compliance',
-    status: 'FAIL',
-    details: 'Some legal policy pages are missing.',
-  });
-}
+// 11. Legal: browser behavior is not policy approval.
+results.push({
+  name: 'Legal Pages',
+  category: 'Compliance',
+  status: browserPassed ? 'PASS' : 'FAIL',
+  details:
+    'Published API-backed policies and FAQ render in Chromium; drafts excluded. Policy accuracy/owner approval remains unverified.',
+});
+results.push({
+  name: 'Production approval',
+  category: 'Release',
+  status: 'UNVERIFIED',
+  details:
+    'Owner-approved policies, real content, production hosting/domain and backup restore require separate evidence. STEP 42 not approved.',
+});
 
 console.log(
   '\n================================================================',
