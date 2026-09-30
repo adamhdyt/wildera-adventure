@@ -405,6 +405,8 @@ export interface MediaAsset {
   altText?: string | null;
   createdBy: string;
   createdAt: string | Date;
+  /** How many trips / mountains reference this asset (present on list & detail). */
+  usage?: { trips: number; mountains: number };
 }
 
 export interface TripMedia {

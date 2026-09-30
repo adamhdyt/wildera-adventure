@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -41,6 +42,7 @@ export class MediaService {
     altText?: string | null;
     createdBy: string;
     createdAt: Date;
+    _count?: { trips: number; mountains: number };
   }): MediaAsset {
     return {
       id: raw.id,
@@ -53,6 +55,9 @@ export class MediaService {
       altText: raw.altText ?? null,
       createdBy: raw.createdBy,
       createdAt: raw.createdAt,
+      usage: raw._count
+        ? { trips: raw._count.trips, mountains: raw._count.mountains }
+        : undefined,
     };
   }
 
@@ -140,6 +145,7 @@ export class MediaService {
         take: limit,
         skip: offset,
         orderBy: { createdAt: 'desc' },
+        include: { _count: { select: { trips: true, mountains: true } } },
       }),
       this.prisma.mediaAsset.count({ where }),
     ]);
@@ -153,6 +159,7 @@ export class MediaService {
   async getById(id: string): Promise<MediaAsset> {
     const asset = await this.prisma.mediaAsset.findUnique({
       where: { id },
+      include: { _count: { select: { trips: true, mountains: true } } },
     });
     if (!asset) {
       throw new NotFoundException({
@@ -161,6 +168,78 @@ export class MediaService {
       });
     }
     return this.mapAsset(asset);
+  }
+
+  async updateAsset(
+    id: string,
+    body: unknown,
+    audit: AuditContext,
+  ): Promise<MediaAsset> {
+    const payload = (body ?? {}) as Record<string, unknown>;
+    const raw = payload.altText;
+    if (raw !== null && raw !== undefined && typeof raw !== 'string') {
+      throw new UnprocessableEntityException({
+        code: 'VALIDATION_ERROR',
+        message: 'Teks alternatif harus berupa teks.',
+      });
+    }
+    if (typeof raw === 'string' && raw.trim().length > 255) {
+      throw new UnprocessableEntityException({
+        code: 'VALIDATION_ERROR',
+        message: 'Teks alternatif maksimal 255 karakter.',
+      });
+    }
+    const existing = await this.getById(id);
+    const altText = typeof raw === 'string' ? raw.trim() || null : null;
+
+    const updated = await this.prisma.mediaAsset.update({
+      where: { id },
+      data: { altText },
+      include: { _count: { select: { trips: true, mountains: true } } },
+    });
+
+    await this.logAudit({
+      action: 'MEDIA_UPDATE',
+      entityId: id,
+      newValue: { altText, previousAltText: existing.altText ?? null },
+      audit,
+    });
+
+    return this.mapAsset(updated);
+  }
+
+  async deleteAsset(id: string, audit: AuditContext): Promise<void> {
+    const asset = await this.prisma.mediaAsset.findUnique({
+      where: { id },
+      include: { _count: { select: { trips: true, mountains: true } } },
+    });
+    if (!asset) {
+      throw new NotFoundException({
+        code: 'MEDIA_NOT_FOUND',
+        message: 'Media tidak ditemukan.',
+      });
+    }
+    const { trips, mountains } = asset._count;
+    if (trips + mountains > 0) {
+      throw new ConflictException({
+        code: 'MEDIA_IN_USE',
+        message: `Foto masih dipakai di ${trips} trip dan ${mountains} gunung. Lepaskan dari sana terlebih dahulu.`,
+      });
+    }
+
+    await this.prisma.mediaAsset.delete({ where: { id } });
+    await this.storage.deleteFile(asset.objectKey);
+
+    await this.logAudit({
+      action: 'MEDIA_DELETE',
+      entityId: id,
+      newValue: {
+        objectKey: asset.objectKey,
+        mimeType: asset.mimeType,
+        fileSizeBytes: Number(asset.fileSizeBytes),
+      },
+      audit,
+    });
   }
 
   async getTripMedia(tripId: string): Promise<TripMediaResponse> {

@@ -48,6 +48,9 @@ export function MediaClient({
   );
   const [selected, setSelected] = useState<MediaAsset | null>(null);
   const [copied, setCopied] = useState(false);
+  const [editAlt, setEditAlt] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [modalError, setModalError] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
 
   const canManage =
@@ -157,6 +160,64 @@ export function MediaClient({
     );
     if (fileInput.current) fileInput.current.value = '';
     setBusy(false);
+  }
+
+  function openDetail(asset: MediaAsset | null) {
+    setSelected(asset);
+    setEditAlt(asset?.altText ?? '');
+    setConfirmDelete(false);
+    setModalError('');
+  }
+
+  async function saveAlt(asset: MediaAsset) {
+    setBusy(true);
+    setModalError('');
+    try {
+      const res = await fetch(`/api/admin/media/${asset.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ altText: editAlt.trim() || null }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setModalError(
+          json.error?.message || 'Gagal menyimpan teks alternatif.',
+        );
+        return;
+      }
+      const updated: MediaAsset = json.data ?? json;
+      setItems((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+      setSelected(updated);
+      setMessage({ type: 'success', text: 'Teks alternatif disimpan.' });
+    } catch {
+      setModalError('Koneksi terputus. Silakan coba lagi.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteAsset(asset: MediaAsset) {
+    setBusy(true);
+    setModalError('');
+    try {
+      const res = await fetch(`/api/admin/media/${asset.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        setModalError(json.error?.message || 'Gagal menghapus foto.');
+        setConfirmDelete(false);
+        return;
+      }
+      setItems((prev) => prev.filter((m) => m.id !== asset.id));
+      setTotal((prev) => Math.max(0, prev - 1));
+      setMessage({ type: 'success', text: 'Foto berhasil dihapus.' });
+      openDetail(null);
+    } catch {
+      setModalError('Koneksi terputus. Silakan coba lagi.');
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function copyUrl(asset: MediaAsset) {
@@ -283,7 +344,7 @@ export function MediaClient({
               key={asset.id}
               type="button"
               className="media-card"
-              onClick={() => setSelected(asset)}
+              onClick={() => openDetail(asset)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -319,7 +380,7 @@ export function MediaClient({
       )}
 
       {selected && (
-        <div className="modal-backdrop" onClick={() => setSelected(null)}>
+        <div className="modal-backdrop" onClick={() => openDetail(null)}>
           <div
             className="modal-dialog"
             onClick={(e) => e.stopPropagation()}
@@ -331,7 +392,7 @@ export function MediaClient({
               <button
                 type="button"
                 className="modal-close"
-                onClick={() => setSelected(null)}
+                onClick={() => openDetail(null)}
                 aria-label="Tutup modal"
               >
                 ×
@@ -344,9 +405,41 @@ export function MediaClient({
                 src={selected.url}
                 alt={selected.altText || selected.objectKey}
               />
+              {canManage && (
+                <div className="form-group" style={{ marginTop: '1rem' }}>
+                  <label htmlFor="media-alt">Teks alternatif</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      id="media-alt"
+                      type="text"
+                      maxLength={255}
+                      value={editAlt}
+                      onChange={(e) => setEditAlt(e.target.value)}
+                      placeholder="Deskripsikan isi foto"
+                    />
+                    <button
+                      type="button"
+                      className="admin-primary"
+                      disabled={
+                        busy || editAlt.trim() === (selected.altText ?? '')
+                      }
+                      onClick={() => void saveAlt(selected)}
+                    >
+                      Simpan
+                    </button>
+                  </div>
+                </div>
+              )}
+              {modalError && (
+                <div className="alert-box alert-error">{modalError}</div>
+              )}
               <dl className="media-detail-list">
-                <dt>Teks alternatif</dt>
-                <dd>{selected.altText || '—'}</dd>
+                <dt>Dipakai di</dt>
+                <dd>
+                  {selected.usage
+                    ? `${selected.usage.trips} trip, ${selected.usage.mountains} gunung`
+                    : '—'}
+                </dd>
                 <dt>Berkas</dt>
                 <dd>{selected.objectKey}</dd>
                 <dt>Tipe</dt>
@@ -375,6 +468,50 @@ export function MediaClient({
               >
                 {copied ? 'Tersalin ✓' : 'Salin URL'}
               </button>
+              {canManage &&
+                (confirmDelete ? (
+                  <>
+                    <span style={{ alignSelf: 'center', fontSize: '0.85rem' }}>
+                      Hapus permanen?
+                    </span>
+                    <button
+                      type="button"
+                      className="btn-sm btn-danger"
+                      disabled={busy}
+                      onClick={() => void deleteAsset(selected)}
+                    >
+                      Ya, hapus
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-sm btn-outline"
+                      onClick={() => setConfirmDelete(false)}
+                    >
+                      Batal
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-sm btn-danger"
+                    disabled={
+                      busy ||
+                      !!(
+                        selected.usage &&
+                        selected.usage.trips + selected.usage.mountains > 0
+                      )
+                    }
+                    title={
+                      selected.usage &&
+                      selected.usage.trips + selected.usage.mountains > 0
+                        ? 'Foto masih dipakai, lepaskan dulu dari trip/gunung.'
+                        : undefined
+                    }
+                    onClick={() => setConfirmDelete(true)}
+                  >
+                    Hapus
+                  </button>
+                ))}
               <a
                 className="btn-sm btn-outline"
                 href={selected.url}

@@ -271,12 +271,66 @@ test('Media upload, listing, trip/mountain attachment, and audit trail', async (
       (await assignMountainRes.json()) as MountainMediaResponse;
     assert.equal(mountainMedia.cover?.mediaId, media1.id);
 
-    // 9. Verify audit logs
+    // 9. Edit alt text and delete: in-use assets are protected, unused ones are removed
+    const patchRes = await fetch(`${baseUrl}/api/v1/admin/media/${media1.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie },
+      body: JSON.stringify({ altText: '  Puncak Rinjani pagi hari  ' }),
+    });
+    assert.equal(patchRes.status, 200);
+    const patched = (await patchRes.json()) as MediaAsset;
+    assert.equal(patched.altText, 'Puncak Rinjani pagi hari');
+
+    const tooLongRes = await fetch(
+      `${baseUrl}/api/v1/admin/media/${media1.id}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Cookie: cookie },
+        body: JSON.stringify({ altText: 'x'.repeat(256) }),
+      },
+    );
+    assert.equal(tooLongRes.status, 422);
+
+    const inUseRes = await fetch(`${baseUrl}/api/v1/admin/media/${media1.id}`, {
+      method: 'DELETE',
+      headers: { Cookie: cookie },
+    });
+    assert.equal(inUseRes.status, 409);
+
+    const spareRes = await fetch(`${baseUrl}/api/v1/admin/media/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie },
+      body: JSON.stringify({
+        filename: 'spare.jpg',
+        mimeType: 'image/jpeg',
+        contentBase64: dummyImage1.toString('base64'),
+      }),
+    });
+    assert.equal(spareRes.status, 201);
+    const spare = (await spareRes.json()) as MediaAsset;
+    const spareFile = await fetch(`${baseUrl}${spare.url}`);
+    assert.equal(spareFile.status, 200);
+
+    const deleteRes = await fetch(`${baseUrl}/api/v1/admin/media/${spare.id}`, {
+      method: 'DELETE',
+      headers: { Cookie: cookie },
+    });
+    assert.equal(deleteRes.status, 204);
+    const afterDelete = await fetch(
+      `${baseUrl}/api/v1/admin/media/${spare.id}`,
+      { headers: { Cookie: cookie } },
+    );
+    assert.equal(afterDelete.status, 404);
+    assert.equal((await fetch(`${baseUrl}${spare.url}`)).status, 404);
+
+    // 10. Verify audit logs
     const auditLogs = await db.query(
       `SELECT action, entity_type, entity_id FROM audit_logs ORDER BY created_at ASC`,
     );
     const actions = auditLogs.rows.map((r) => r.action);
     assert.ok(actions.includes('MEDIA_UPLOAD'));
+    assert.ok(actions.includes('MEDIA_UPDATE'));
+    assert.ok(actions.includes('MEDIA_DELETE'));
     assert.ok(actions.includes('TRIP_MEDIA_UPDATE'));
     assert.ok(actions.includes('MOUNTAIN_MEDIA_UPDATE'));
   } finally {

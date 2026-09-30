@@ -42,6 +42,11 @@ export class MediaStorageService {
     return { objectKey, url };
   }
 
+  async deleteFile(objectKey: string): Promise<void> {
+    const fullPath = this.resolveFullPath(objectKey);
+    await fs.rm(fullPath, { force: true });
+  }
+
   resolveFullPath(objectKey: string): string {
     const fullPath = path.resolve(process.cwd(), objectKey);
     // Serve only files inside the uploads directory (blocks ../ traversal).
