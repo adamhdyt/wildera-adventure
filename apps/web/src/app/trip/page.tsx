@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import type { PublicTripSummary } from '@wildera/types';
 import {
   fetchPublicSiteSettings,
   fetchPublicTrips,
@@ -31,129 +30,13 @@ export const metadata: Metadata = {
   },
 };
 
-const FALLBACK_CATALOG_TRIPS: PublicTripSummary[] = [
-  {
-    id: 'catalog-prau',
-    name: 'Open Trip Gunung Prau 2D1N via Dieng',
-    slug: 'open-trip-gunung-prau-2d1n',
-    tripType: 'OPEN_TRIP',
-    difficulty: 'EASY',
-    beginnerFriendly: true,
-    duration: { days: 2, nights: 1 },
-    mountain: {
-      name: 'Gunung Prau',
-      slug: 'gunung-prau',
-      altitudeM: 2565,
-    },
-    coverImage: {
-      url: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop',
-      alt: 'Gunung Prau',
-    },
-    nextSchedule: {
-      id: 'sched-prau-1',
-      startDate: '2026-09-26',
-      endDate: '2026-09-27',
-      capacity: 15,
-      confirmedSeats: 7,
-      availableSeats: 8,
-      availabilityStatus: 'AVAILABLE',
-      startingPrice: 950000,
-    },
-  },
-  {
-    id: 'catalog-rinjani',
-    name: 'Open Trip Gunung Rinjani 4D3N via Sembalun',
-    slug: 'open-trip-gunung-rinjani-4d3n',
-    tripType: 'OPEN_TRIP',
-    difficulty: 'HARD',
-    beginnerFriendly: false,
-    duration: { days: 4, nights: 3 },
-    mountain: {
-      name: 'Gunung Rinjani',
-      slug: 'gunung-rinjani',
-      altitudeM: 3726,
-    },
-    coverImage: {
-      url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
-      alt: 'Gunung Rinjani',
-    },
-    nextSchedule: {
-      id: 'sched-rinjani-1',
-      startDate: '2026-10-15',
-      endDate: '2026-10-18',
-      capacity: 12,
-      confirmedSeats: 10,
-      availableSeats: 2,
-      availabilityStatus: 'ALMOST_FULL',
-      startingPrice: 2450000,
-    },
-  },
-  {
-    id: 'catalog-semeru',
-    name: 'Private Trip Mahameru Semeru 3D2N',
-    slug: 'private-trip-semeru-3d2n',
-    tripType: 'PRIVATE_TRIP',
-    difficulty: 'HARD',
-    beginnerFriendly: false,
-    duration: { days: 3, nights: 2 },
-    mountain: {
-      name: 'Gunung Semeru',
-      slug: 'gunung-semeru',
-      altitudeM: 3676,
-    },
-    coverImage: {
-      url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop',
-      alt: 'Gunung Semeru',
-    },
-    nextSchedule: {
-      id: 'sched-semeru-1',
-      startDate: '2026-11-05',
-      endDate: '2026-11-07',
-      capacity: 10,
-      confirmedSeats: 3,
-      availableSeats: 7,
-      availabilityStatus: 'AVAILABLE',
-      startingPrice: 3200000,
-    },
-  },
-  {
-    id: 'catalog-gede',
-    name: 'Open Trip Gunung Gede 2D1N via Putri',
-    slug: 'open-trip-gunung-gede-2d1n',
-    tripType: 'OPEN_TRIP',
-    difficulty: 'MODERATE',
-    beginnerFriendly: true,
-    duration: { days: 2, nights: 1 },
-    mountain: {
-      name: 'Gunung Gede',
-      slug: 'gunung-gede',
-      altitudeM: 2958,
-    },
-    coverImage: {
-      url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=1200&auto=format&fit=crop',
-      alt: 'Gunung Gede',
-    },
-    nextSchedule: {
-      id: 'sched-gede-1',
-      startDate: '2026-10-24',
-      endDate: '2026-10-25',
-      capacity: 16,
-      confirmedSeats: 16,
-      availableSeats: 0,
-      availabilityStatus: 'SOLD_OUT',
-      startingPrice: 850000,
-    },
-  },
-];
-
 export default async function TripCatalogPage() {
   const [apiTrips, settings] = await Promise.all([
     fetchPublicTrips(),
     fetchPublicSiteSettings(),
   ]);
 
-  const trips =
-    apiTrips && apiTrips.length > 0 ? apiTrips : FALLBACK_CATALOG_TRIPS;
+  const trips = apiTrips ?? [];
 
   const whatsappNumber =
     (settings?.contact_whatsapp as string) || '6281234567890';

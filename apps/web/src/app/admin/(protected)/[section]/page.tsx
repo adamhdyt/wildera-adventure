@@ -1,11 +1,32 @@
 /* Revalidate the complete admin shell when returning from a restricted page. */
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { notFound } from 'next/navigation';
-import { requireAdmin, fetchAdminApi } from '../../../../lib/admin-session';
+import { requireAdmin } from '../../../../lib/admin-session';
+import {
+  bookingStatusOrder,
+  loadDashboardData,
+} from '../../../../lib/admin-dashboard';
 import {
   adminSections,
   canViewSection,
 } from '../../../../lib/admin-navigation';
+
+const bookingStatusLabel = {
+  INQUIRY: 'Inquiry',
+  PENDING_CONFIRMATION: 'Menunggu konfirmasi',
+  CONFIRMED: 'Terkonfirmasi',
+  COMPLETED: 'Selesai',
+  CANCELLED: 'Dibatalkan',
+  NO_SHOW: 'Tidak hadir',
+} as const;
+
+function formatDate(value: string | Date) {
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
 
 export default async function AdminSectionPage({
   params,
@@ -31,39 +52,10 @@ export default async function AdminSectionPage({
       </section>
     );
 
-  let tripCount = 0;
-  let scheduleCount = 0;
-  let bookingCount = 0;
-  let inquiryCount = 0;
-
-  if (slug === 'dashboard') {
-    try {
-      const [tripsRes, schedRes, bookRes, inqRes] = await Promise.all([
-        fetchAdminApi('admin/trips?pageSize=1'),
-        fetchAdminApi('admin/schedules?pageSize=1'),
-        fetchAdminApi('admin/bookings?pageSize=1'),
-        fetchAdminApi('admin/private-trip-inquiries?pageSize=1'),
-      ]);
-      if (tripsRes.ok) {
-        const d = await tripsRes.json();
-        tripCount = d.total ?? d.items?.length ?? 0;
-      }
-      if (schedRes.ok) {
-        const d = await schedRes.json();
-        scheduleCount = d.total ?? d.data?.length ?? 0;
-      }
-      if (bookRes.ok) {
-        const d = await bookRes.json();
-        bookingCount = d.total ?? d.items?.length ?? 0;
-      }
-      if (inqRes.ok) {
-        const d = await inqRes.json();
-        inquiryCount = d.total ?? d.data?.length ?? 0;
-      }
-    } catch {
-      // Graceful fallback
-    }
-  }
+  const operational =
+    user.roles.includes('SUPER_ADMIN') || user.roles.includes('OPERATIONS');
+  const data =
+    slug === 'dashboard' ? await loadDashboardData(operational) : null;
 
   return (
     <>
@@ -73,46 +65,165 @@ export default async function AdminSectionPage({
         <p>{section.description}</p>
       </div>
 
-      {slug === 'dashboard' ? (
+      {slug === 'dashboard' && data ? (
         <div className="dashboard-overview" style={{ marginTop: '1.5rem' }}>
+          {data.failed && (
+            <div className="alert-box alert-error">
+              Sebagian data dashboard gagal dimuat. Muat ulang halaman untuk
+              mencoba lagi.
+            </div>
+          )}
           <div className="admin-metrics-grid">
             <a href="/admin/trips" className="metric-card">
               <div className="metric-header">
                 <span className="metric-title">Paket Trip</span>
                 <span className="metric-badge">Katalog</span>
               </div>
-              <span className="metric-value">{tripCount}</span>
-              <span className="metric-subtext">Trip gunung terpublikasi</span>
+              <span className="metric-value">{data.tripCount}</span>
+              <span className="metric-subtext">Trip terdaftar di katalog</span>
             </a>
             <a href="/admin/schedules" className="metric-card">
               <div className="metric-header">
-                <span className="metric-title">Jadwal Keberangkatan</span>
+                <span className="metric-title">Jadwal Dibuka</span>
                 <span className="metric-badge">Operasional</span>
               </div>
-              <span className="metric-value">{scheduleCount}</span>
-              <span className="metric-subtext">Jadwal dengan kuota aktif</span>
+              <span className="metric-value">{data.openScheduleCount}</span>
+              <span className="metric-subtext">Jadwal berstatus OPEN</span>
             </a>
-            <a href="/admin/bookings" className="metric-card accent-orange">
+            {operational && (
+              <>
+                <a href="/admin/bookings" className="metric-card accent-orange">
+                  <div className="metric-header">
+                    <span className="metric-title">Total Booking</span>
+                    <span className="metric-badge badge-orange">Konversi</span>
+                  </div>
+                  <span className="metric-value">{data.bookingCount}</span>
+                  <span className="metric-subtext">
+                    {data.bookingsByStatus.PENDING_CONFIRMATION +
+                      data.bookingsByStatus.INQUIRY}{' '}
+                    menunggu konfirmasi
+                  </span>
+                </a>
+                <a
+                  href="/admin/private-trips"
+                  className="metric-card accent-orange"
+                >
+                  <div className="metric-header">
+                    <span className="metric-title">Inquiry Private</span>
+                    <span className="metric-badge badge-orange">Kustom</span>
+                  </div>
+                  <span className="metric-value">{data.inquiryCount}</span>
+                  <span className="metric-subtext">
+                    {data.newInquiryCount} baru belum ditindaklanjuti
+                  </span>
+                </a>
+              </>
+            )}
+            <a href="/admin/media" className="metric-card">
               <div className="metric-header">
-                <span className="metric-title">Total Booking</span>
-                <span className="metric-badge badge-orange">Konversi</span>
+                <span className="metric-title">Media</span>
+                <span className="metric-badge">Pustaka</span>
               </div>
-              <span className="metric-value">{bookingCount}</span>
-              <span className="metric-subtext">
-                Pesanan terdaftar di sistem
-              </span>
+              <span className="metric-value">{data.mediaCount}</span>
+              <span className="metric-subtext">Foto tersimpan</span>
             </a>
-            <a
-              href="/admin/private-trips"
-              className="metric-card accent-orange"
-            >
-              <div className="metric-header">
-                <span className="metric-title">Inquiry Private</span>
-                <span className="metric-badge badge-orange">Kustom</span>
-              </div>
-              <span className="metric-value">{inquiryCount}</span>
-              <span className="metric-subtext">Pengajuan kustom menunggu</span>
-            </a>
+          </div>
+
+          <div className="dashboard-panels">
+            {operational && (
+              <section className="dashboard-panel">
+                <h2>Status Booking</h2>
+                {data.bookingCount === 0 ? (
+                  <p className="panel-empty">Belum ada booking.</p>
+                ) : (
+                  <ul className="status-bars">
+                    {bookingStatusOrder.map((status) => {
+                      const count = data.bookingsByStatus[status];
+                      const pct = Math.round((count / data.bookingCount) * 100);
+                      return (
+                        <li key={status}>
+                          <span className="status-bar-label">
+                            {bookingStatusLabel[status]}
+                          </span>
+                          <span className="status-bar-track">
+                            <span
+                              className={`status-bar-fill status-${status.toLowerCase()}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </span>
+                          <span className="status-bar-count">{count}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </section>
+            )}
+
+            <section className="dashboard-panel">
+              <h2>Keberangkatan Mendatang</h2>
+              {data.upcomingSchedules.length === 0 ? (
+                <p className="panel-empty">
+                  Belum ada jadwal terbuka yang akan datang.
+                </p>
+              ) : (
+                <ul className="panel-list">
+                  {data.upcomingSchedules.map((s) => (
+                    <li key={s.id}>
+                      <a href="/admin/schedules">
+                        <strong>{s.trip?.name ?? 'Trip'}</strong>
+                        <span>
+                          {formatDate(s.startDate)} · {s.confirmedSeats ?? 0}/
+                          {s.capacity} peserta
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {operational && (
+              <section className="dashboard-panel dashboard-panel-wide">
+                <h2>Booking Terbaru</h2>
+                {data.recentBookings.length === 0 ? (
+                  <p className="panel-empty">Belum ada booking masuk.</p>
+                ) : (
+                  <div className="table-wrapper">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>No. Booking</th>
+                          <th>Kontak</th>
+                          <th>Trip</th>
+                          <th>Peserta</th>
+                          <th>Status</th>
+                          <th>Masuk</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.recentBookings.map((b) => (
+                          <tr key={b.id}>
+                            <td>
+                              <a href="/admin/bookings">{b.bookingNumber}</a>
+                            </td>
+                            <td>{b.contactName}</td>
+                            <td>{b.schedule?.trip?.name ?? '—'}</td>
+                            <td>{b.participantCount}</td>
+                            <td>
+                              <span className="badge badge-count">
+                                {bookingStatusLabel[b.status]}
+                              </span>
+                            </td>
+                            <td>{formatDate(b.createdAt)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+            )}
           </div>
 
           <div>

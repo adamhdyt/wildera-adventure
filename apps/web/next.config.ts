@@ -13,6 +13,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    // Uploaded media is stored with an /api/v1/media/file/... URL; serve it
+    // from the API so the same URL works on the public site and in admin.
+    const apiBase = process.env.API_BASE_URL?.replace(/\/$/, '');
+    if (!apiBase) return [];
+    return [
+      {
+        source: '/api/v1/media/file/:path*',
+        destination: `${apiBase}/media/file/:path*`,
+      },
+    ];
+  },
   async headers() {
     return [
       {

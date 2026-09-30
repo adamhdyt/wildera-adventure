@@ -43,7 +43,11 @@ export class MediaStorageService {
   }
 
   resolveFullPath(objectKey: string): string {
-    const safeKey = objectKey.replace(/^(\.\.[/\\])+/, '');
-    return path.resolve(process.cwd(), safeKey);
+    const fullPath = path.resolve(process.cwd(), objectKey);
+    // Serve only files inside the uploads directory (blocks ../ traversal).
+    if (!fullPath.startsWith(this.uploadDir + path.sep)) {
+      return path.join(this.uploadDir, '.missing');
+    }
+    return fullPath;
   }
 }

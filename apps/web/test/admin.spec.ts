@@ -96,6 +96,7 @@ test('login, navigation, mobile keyboard, logout and revoked cookie', async ({
     'Destinasi',
     'Gunung',
     'Jalur pendakian',
+    'Media',
     'Konten',
     'Pengaturan',
     'Audit Log',
@@ -149,6 +150,12 @@ test('login, navigation, mobile keyboard, logout and revoked cookie', async ({
     } else if (label === 'Audit Log') {
       await expect(
         page.getByRole('button', { name: 'Export CSV' }),
+      ).toBeVisible();
+    } else if (label === 'Dashboard') {
+      await expect(page.getByText('Aksi Cepat Manajemen')).toBeVisible();
+    } else if (label === 'Media') {
+      await expect(
+        page.getByRole('button', { name: '+ Unggah Foto' }),
       ).toBeVisible();
     } else {
       await expect(
