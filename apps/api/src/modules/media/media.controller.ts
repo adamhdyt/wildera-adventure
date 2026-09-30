@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -87,6 +89,34 @@ export class MediaController {
     return this.mediaService.getById(id);
   }
 
+  @Patch('admin/media/:id')
+  @Authorize(Permission.CATALOG_MANAGE)
+  async update(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @Req() req: AuthenticatedRequest,
+  ): Promise<MediaAsset> {
+    return this.mediaService.updateAsset(id, body, {
+      userId: req.admin?.id,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+  }
+
+  @Delete('admin/media/:id')
+  @Authorize(Permission.CATALOG_MANAGE)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(
+    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
+  ): Promise<void> {
+    await this.mediaService.deleteAsset(id, {
+      userId: req.admin?.id,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+  }
+
   // Trip Media endpoints
   @Get('admin/trips/:id/media')
   @Authorize(Permission.CATALOG_VIEW)
@@ -136,9 +166,11 @@ export class MediaController {
   // File streaming endpoint
   @Get('media/file/*path')
   serveFile(@Req() req: Request, @Res() res: Response): void {
-    const objectKey =
-      (req.params as Record<string, string>)?.path ||
-      (req.url.split('/media/file/')[1] ?? '');
+    // Express 5 wildcard params arrive as an array of path segments.
+    const rawPath = (req.params as Record<string, string | string[]>)?.path;
+    const objectKey = Array.isArray(rawPath)
+      ? rawPath.join('/')
+      : rawPath || (req.url.split('/media/file/')[1] ?? '');
     const filePath = this.storage.resolveFullPath(objectKey);
 
     if (!fs.existsSync(filePath)) {

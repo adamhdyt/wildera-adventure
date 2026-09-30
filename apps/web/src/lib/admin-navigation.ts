@@ -50,6 +50,12 @@ export const adminSections = [
     description: 'Jalur dan titik awal pendakian untuk setiap gunung.',
   },
   {
+    slug: 'media',
+    label: 'Media',
+    group: 'Katalog',
+    description: 'Pustaka foto untuk trip, gunung, dan konten website.',
+  },
+  {
     slug: 'content',
     label: 'Konten',
     group: 'Pengelolaan',

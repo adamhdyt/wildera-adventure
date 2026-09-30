@@ -10,6 +10,7 @@ import {
   buildPrivateTripWhatsAppMessage,
   buildWhatsAppUrl,
 } from '../../../lib/whatsapp';
+import { mountainTitle } from '../../../lib/mountain-title';
 import { Navbar } from '../../../components/public/navbar';
 import { Footer } from '../../../components/public/footer';
 import { TripCard } from '../../../components/trip/trip-card';
@@ -394,7 +395,7 @@ export default async function MountainDetailPage({ params }: PageProps) {
               </span>
             </div>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold text-white tracking-tight">
-              Gunung {mountain.name}
+              {mountainTitle(mountain.name)}
             </h1>
           </div>
 
@@ -458,7 +459,7 @@ export default async function MountainDetailPage({ params }: PageProps) {
         >
           <div className="lg:col-span-2 flex flex-col gap-4">
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-              Tentang Gunung {mountain.name}
+              Tentang {mountainTitle(mountain.name)}
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed">
               {mountain.description ||
@@ -631,7 +632,7 @@ export default async function MountainDetailPage({ params }: PageProps) {
                 Jadwal Tersedia
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
-                Trip ke Gunung {mountain.name}
+                Trip ke {mountainTitle(mountain.name)}
               </h2>
               <p className="text-sm text-muted-foreground">
                 Daftar keberangkatan Open Trip & paket petualangan terdekat.
@@ -662,9 +663,9 @@ export default async function MountainDetailPage({ params }: PageProps) {
                   Belum ada jadwal Open Trip terdekat
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
-                  Ingin mendaki Gunung {mountain.name} di tanggal pilihanmu
-                  sendiri bersama teman atau kolega? Ajukan Private Trip kustom
-                  bersama tim Wildera.
+                  Ingin mendaki {mountainTitle(mountain.name)} di tanggal
+                  pilihanmu sendiri bersama teman atau kolega? Ajukan Private
+                  Trip kustom bersama tim Wildera.
                 </p>
               </div>
               <a

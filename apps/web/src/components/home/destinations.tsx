@@ -1,9 +1,16 @@
 import Link from 'next/link';
-import type { PublicDestination } from '@wildera/types';
+import type { DifficultyLevel, PublicMountainSummary } from '@wildera/types';
 
 interface DestinationsProps {
-  destinations?: PublicDestination[];
+  mountains?: PublicMountainSummary[];
 }
+
+const DIFFICULTY_LABEL: Record<DifficultyLevel, string> = {
+  EASY: 'Mudah',
+  MODERATE: 'Menengah',
+  HARD: 'Menantang',
+  EXTREME: 'Ekstrem',
+};
 
 interface DestinationCardItem {
   id: string;
@@ -58,23 +65,20 @@ const FALLBACK_DESTINATIONS: DestinationCardItem[] = [
   },
 ];
 
-export function Destinations({ destinations }: DestinationsProps) {
-  // Map API destinations if available, otherwise use curated luxury fallback
+export function Destinations({ mountains }: DestinationsProps) {
+  // Real published mountains (with their cover photo) first; curated fallback only when none exist.
+  const live = (mountains ?? []).filter((m) => m.coverImage.url);
   const cards: DestinationCardItem[] =
-    destinations && destinations.length > 0
-      ? destinations.slice(0, 4).map((d, i) => {
-          const fallback =
-            FALLBACK_DESTINATIONS[i % FALLBACK_DESTINATIONS.length]!;
-          return {
-            id: d.id,
-            title: d.name,
-            subtitle: d.province ? `Kawasan ${d.province}` : fallback.subtitle,
-            region: d.province || fallback.region,
-            altitude: fallback.altitude,
-            image: fallback.image,
-            slug: d.slug,
-          };
-        })
+    live.length > 0
+      ? live.slice(0, 4).map((m) => ({
+          id: m.id,
+          title: m.name,
+          subtitle: `Jalur ${DIFFICULTY_LABEL[m.defaultDifficulty] ?? ''} · Kawasan ${m.destination.name}`,
+          region: m.destination.name,
+          altitude: `${m.altitudeM.toLocaleString('id-ID')} mdpl`,
+          image: m.coverImage.url,
+          slug: m.slug,
+        }))
       : FALLBACK_DESTINATIONS;
 
   return (
@@ -89,8 +93,8 @@ export function Destinations({ destinations }: DestinationsProps) {
             Eksplorasi Puncak Ikonik
           </h2>
           <p className="max-w-2xl text-base md:text-lg leading-relaxed text-foreground/80 text-balance">
-            Dari kaldera vulkanik Lombok hingga punggungan hijau di tanah Jawa.
-            Temukan rute pendakian terbaik yang siap ditaklukkan.
+            Dari puncak tertinggi Pulau Jawa hingga punggungan savana yang
+            hijau. Temukan rute pendakian terbaik yang siap ditaklukkan.
           </p>
         </div>
 

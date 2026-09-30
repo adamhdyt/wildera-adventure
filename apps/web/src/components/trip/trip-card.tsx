@@ -117,8 +117,8 @@ export function TripCard({ trip }: TripCardProps) {
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-          <span className="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded backdrop-blur-md bg-foreground/80 text-background shadow">
-            {trip.tripType === 'OPEN_TRIP' ? 'Open Trip' : 'Private Trip'}
+          <span className="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded backdrop-blur-md bg-black/65 text-white shadow">
+            {trip.tripType === 'PRIVATE_TRIP' ? 'Private Trip' : 'Open Trip'}
           </span>
           {seatBadge}
         </div>

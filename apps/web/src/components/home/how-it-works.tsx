@@ -5,40 +5,35 @@ export function HowItWorks() {
       title: 'Pilih Trip & Jadwal',
       shortTitle: 'Pilih',
       desc: 'Tentukan gunung dan tanggal yang sesuai dengan ketersediaan waktumu melalui katalog open trip atau ajukan tanggal private trip.',
-      image:
-        'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1200&auto=format&fit=crop',
+      image: '/images/pexels/38262907.jpg',
     },
     {
       num: '02',
       title: 'Konsultasi Admin via WhatsApp',
       shortTitle: 'Konsultasi',
       desc: 'Diskusikan kuota kursi, pilihan paket titik temu, dan konsultasi kesiapan fisik bersama trip specialist kami.',
-      image:
-        'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop',
+      image: '/images/pexels/2870346.jpg',
     },
     {
       num: '03',
       title: 'Konfirmasi & Pembayaran Aman',
       shortTitle: 'Konfirmasi',
       desc: 'Kunci slot pendakianmu dengan pembayaran DP resmi. Dapatkan tanda terima, bukti pemesanan, dan jaminan kuota berangkat.',
-      image:
-        'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop',
+      image: '/images/pexels/35232865.jpg',
     },
     {
       num: '04',
       title: 'Persiapan Fisik & Perlengkapan',
       shortTitle: 'Persiapan',
       desc: 'Dapatkan panduan packing list, briefing SOP keselamatan, dan bergabung ke grup koordinasi peserta sebelum keberangkatan.',
-      image:
-        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop',
+      image: '/images/pexels/35875316.jpg',
     },
     {
       num: '05',
       title: 'Berangkat & Capai Puncak',
       shortTitle: 'Berangkat',
       desc: 'Bertemu tim di meeting point yang disepakati, nikmati keindahan alam Indonesia, dan ciptakan momen puncak yang aman bersama Wildera.',
-      image:
-        'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=1200',
+      image: '/images/pexels/33236327.jpg',
     },
   ];
 

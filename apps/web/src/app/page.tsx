@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import {
-  fetchPublicDestinations,
+  fetchPublicMountains,
   fetchPublicFaqs,
   fetchPublicSiteSettings,
   fetchPublicTrips,
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   // Concurrent data fetching with graceful resilience
-  const [trips, destinations, faqs, settings] = await Promise.all([
+  const [trips, mountains, faqs, settings] = await Promise.all([
     fetchPublicTrips(),
-    fetchPublicDestinations(),
+    fetchPublicMountains(),
     fetchPublicFaqs(),
     fetchPublicSiteSettings(),
   ]);
@@ -74,7 +74,7 @@ export default async function HomePage() {
         <UpcomingTrips trips={trips} />
 
         {/* 4. Explore Destinations Section */}
-        <Destinations destinations={destinations} />
+        <Destinations mountains={mountains} />
 
         {/* 5. Booking Journey Section */}
         <HowItWorks />

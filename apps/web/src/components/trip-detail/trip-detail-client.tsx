@@ -1,5 +1,6 @@
 'use client';
 
+import { mountainTitle } from '../../lib/mountain-title';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { PublicTripDetail } from '@wildera/types';
@@ -180,7 +181,9 @@ export function TripDetailClient({
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-accent text-white">
-                {trip.tripType === 'OPEN_TRIP' ? 'Open Trip' : 'Private Trip'}
+                {trip.tripType === 'PRIVATE_TRIP'
+                  ? 'Private Trip'
+                  : 'Open Trip'}
               </span>
               <span
                 className={`px-2.5 py-1 rounded text-xs font-semibold border backdrop-blur-md flex items-center gap-1.5 bg-black/75 text-white ${diffConfig.badgeBorder}`}
@@ -228,7 +231,7 @@ export function TripDetailClient({
                   />
                 </svg>
                 <span>
-                  Gunung {trip.mountain.name}
+                  {mountainTitle(trip.mountain.name)}
                   {trip.route ? ` via ${trip.route.name}` : ''}
                 </span>
               </span>

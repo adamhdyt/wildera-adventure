@@ -405,6 +405,8 @@ export interface MediaAsset {
   altText?: string | null;
   createdBy: string;
   createdAt: string | Date;
+  /** How many trips / mountains reference this asset (present on list & detail). */
+  usage?: { trips: number; mountains: number };
 }
 
 export interface TripMedia {
@@ -785,6 +787,7 @@ export interface PublicMountainSummary {
   id: string;
   name: string;
   slug: string;
+  shortDescription?: string | null;
   altitudeM: number;
   defaultDifficulty: DifficultyLevel;
   destination: {

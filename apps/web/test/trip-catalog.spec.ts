@@ -1,4 +1,70 @@
 import { expect, test } from '@playwright/test';
+import { Client } from 'pg';
+
+let db: Client;
+
+// The catalog no longer falls back to demo data, so the tests seed real rows.
+test.beforeAll(async () => {
+  const url = new URL(process.env.DATABASE_URL!);
+  if (
+    !process.env.ADMIN_TEST_DATABASE?.startsWith('wildera_admin_test_') ||
+    url.pathname !== `/${process.env.ADMIN_TEST_DATABASE}`
+  ) {
+    throw new Error('Run through npm run test:admin');
+  }
+  db = new Client({ connectionString: url.toString() });
+  await db.connect();
+  const admin = await db.query(
+    `INSERT INTO admin_users(name,email,password_hash) VALUES ('Catalog fixture','catalog@wildera.test','disabled-test-fixture') RETURNING id`,
+  );
+  const dest = await db.query(
+    `INSERT INTO destinations(name,slug) VALUES ('Catalog destination','catalog-destination') RETURNING id`,
+  );
+  const mountain = await db.query(
+    `INSERT INTO mountains(destination_id,name,slug,status) VALUES ($1,'Catalog mountain','catalog-mountain','PUBLISHED') RETURNING id`,
+    [dest.rows[0].id],
+  );
+  for (const [slug, name] of [
+    ['catalog-alpha', 'Alpine Catalog Alpha'],
+    ['catalog-bravo', 'Bravo Catalog Summit'],
+  ]) {
+    const trip = await db.query(
+      `INSERT INTO trips(mountain_id,name,slug,trip_type,duration_days,difficulty,status,created_by)
+      VALUES ($1,$2,$3,'OPEN_TRIP',2,'EASY','PUBLISHED',$4) RETURNING id`,
+      [mountain.rows[0].id, name, slug, admin.rows[0].id],
+    );
+    const schedule = await db.query(
+      `INSERT INTO trip_schedules(trip_id,start_date,end_date,capacity,status,created_by)
+      VALUES ($1,CURRENT_DATE + 40,CURRENT_DATE + 41,10,'OPEN',$2) RETURNING id`,
+      [trip.rows[0].id, admin.rows[0].id],
+    );
+    await db.query(
+      `INSERT INTO schedule_packages(schedule_id,name,price,status) VALUES ($1,'Catalog package',500000,'ACTIVE')`,
+      [schedule.rows[0].id],
+    );
+  }
+});
+
+test.afterAll(async () => {
+  if (!db) return;
+  try {
+    const trips = `SELECT id FROM trips WHERE slug LIKE 'catalog-%'`;
+    await db.query(
+      `DELETE FROM schedule_packages WHERE schedule_id IN (SELECT id FROM trip_schedules WHERE trip_id IN (${trips}))`,
+    );
+    await db.query(`DELETE FROM trip_schedules WHERE trip_id IN (${trips})`);
+    await db.query(`DELETE FROM trips WHERE slug LIKE 'catalog-%'`);
+    await db.query(`DELETE FROM mountains WHERE slug = 'catalog-mountain'`);
+    await db.query(
+      `DELETE FROM destinations WHERE slug = 'catalog-destination'`,
+    );
+    await db.query(
+      `DELETE FROM admin_users WHERE email = 'catalog@wildera.test'`,
+    );
+  } finally {
+    await db.end();
+  }
+});
 
 test.describe('Public Trip Catalog (STEP 19)', () => {
   test.beforeEach(async ({ page }) => {
