@@ -20,3 +20,4 @@ placeholder pengembangan; ganti dengan foto asli Wildera Adventure sebelum rilis
 | 2870346.jpg | Muhammad Syahroyni | https://www.pexels.com/photo/2870346/ |
 | 4552428.jpg | Roman Odintsov | https://www.pexels.com/photo/4552428/ |
 | 28386069.jpg | GSN Travel | https://www.pexels.com/photo/28386069/ |
+| 38262907.jpg | Daneswara Eka | https://www.pexels.com/photo/38262907/ |
