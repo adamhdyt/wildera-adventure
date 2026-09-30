@@ -10,7 +10,7 @@ test.describe('Public Homepage (STEP 18)', () => {
     const nav = page.locator('nav[data-section="navbar"]');
     await expect(nav).toBeVisible();
     await expect(
-      nav.getByRole('link', { name: 'Wildera', exact: true }),
+      nav.getByRole('link', { name: 'Wildera Adventure', exact: true }),
     ).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Explore Trip' })).toBeVisible();
     await expect(nav.getByRole('link', { name: 'Destinasi' })).toBeVisible();

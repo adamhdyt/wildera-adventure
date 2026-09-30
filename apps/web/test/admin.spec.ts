@@ -613,7 +613,7 @@ test('trip management UI supports create, link to mountain and route, edit, and 
     .fill('Tenda & Matras');
 
   // Gears: Add Mandatory
-  await page.getByRole('button', { name: /🥾 Perlengkapan/ }).click();
+  await page.getByRole('button', { name: /🧗 Gear/ }).click();
   await page.getByRole('button', { name: '+ Wajib Bawa' }).click();
   await page
     .getByPlaceholder('Nama alat (contoh: Sepatu Trekking Mid/High Cut)')
