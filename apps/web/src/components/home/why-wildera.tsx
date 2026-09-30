@@ -3,17 +3,18 @@ export function WhyWildera() {
     {
       icon: (
         <svg
-          className="size-6 text-accent"
+          aria-hidden="true"
+          className="size-7 text-white"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          />
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="M9 12h6" />
+          <path d="M12 9v6" />
         </svg>
       ),
       title: 'Standar Keselamatan Medis Ketat',
@@ -23,17 +24,17 @@ export function WhyWildera() {
     {
       icon: (
         <svg
-          className="size-6 text-accent"
+          aria-hidden="true"
+          className="size-7 text-white"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-          />
+          <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+          <path d="m9 12 2 2 4-4" />
         </svg>
       ),
       title: 'Guide Bersertifikat & Porter Handal',
@@ -43,17 +44,19 @@ export function WhyWildera() {
     {
       icon: (
         <svg
-          className="size-6 text-accent"
+          aria-hidden="true"
+          className="size-7 text-white"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"
-          />
+          <path d="M3.5 21 14 3" />
+          <path d="M20.5 21 10 3" />
+          <path d="M15.5 21 12 15l-3.5 6" />
+          <path d="M2 21h20" />
         </svg>
       ),
       title: 'Camp Nyaman & Sajian Hangat',
@@ -63,17 +66,19 @@ export function WhyWildera() {
     {
       icon: (
         <svg
-          className="size-6 text-accent"
+          aria-hidden="true"
+          className="size-7 text-white"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
+          <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+          <path d="M14 8H8" />
+          <path d="M16 12H8" />
+          <path d="M13 16H8" />
         </svg>
       ),
       title: 'Transparansi Biaya & Pelayanan Prima',
