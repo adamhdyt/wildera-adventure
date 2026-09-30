@@ -1,5 +1,6 @@
 'use client';
 
+import { mountainTitle } from '../../lib/mountain-title';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { PublicTripDetail } from '@wildera/types';
@@ -228,7 +229,7 @@ export function TripDetailClient({
                   />
                 </svg>
                 <span>
-                  Gunung {trip.mountain.name}
+                  {mountainTitle(trip.mountain.name)}
                   {trip.route ? ` via ${trip.route.name}` : ''}
                 </span>
               </span>

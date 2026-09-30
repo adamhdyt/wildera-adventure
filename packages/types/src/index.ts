@@ -787,6 +787,7 @@ export interface PublicMountainSummary {
   id: string;
   name: string;
   slug: string;
+  shortDescription?: string | null;
   altitudeM: number;
   defaultDifficulty: DifficultyLevel;
   destination: {

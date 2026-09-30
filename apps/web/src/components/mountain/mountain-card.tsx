@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { PublicMountainSummary } from '@wildera/types';
+import { mountainTitle } from '../../lib/mountain-title';
 
 interface MountainCardProps {
   mountain: PublicMountainSummary;
@@ -118,10 +119,11 @@ export function MountainCard({ mountain }: MountainCardProps) {
       <div className="flex flex-col flex-1 p-5 gap-3">
         <div>
           <h3 className="text-xl font-serif font-bold text-foreground group-hover:text-accent transition-colors leading-tight">
-            Gunung {mountain.name}
+            {mountainTitle(mountain.name)}
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Puncak atap kepulauan dengan lanskap panorama spektakuler.
+            {mountain.shortDescription ||
+              'Puncak atap kepulauan dengan lanskap panorama spektakuler.'}
           </p>
         </div>
 

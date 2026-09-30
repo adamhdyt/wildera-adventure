@@ -474,6 +474,7 @@ export class MountainService {
         id: m.id,
         name: m.name,
         slug: m.slug,
+        shortDescription: m.shortDescription ?? null,
         altitudeM: m.altitudeM ?? 0,
         defaultDifficulty: m.defaultDifficulty ?? 'MODERATE',
         city: m.destination.region ?? null,
