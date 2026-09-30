@@ -1542,3 +1542,47 @@ textarea.form-input {
 .nav-group a[aria-current]::after {
   border-color: white;
 }
+
+/* Loading skeleton shown inside the admin shell */
+.admin-skeleton {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+.admin-skeleton-line,
+.admin-skeleton-card {
+  display: block;
+  background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 50%, #eef2f7 75%);
+  background-size: 200% 100%;
+  animation: admin-shimmer 1.2s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+.admin-skeleton-line {
+  height: 1rem;
+  max-width: 28rem;
+}
+.admin-skeleton-title {
+  height: 2.25rem;
+  max-width: 14rem;
+}
+.admin-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+.admin-skeleton-card {
+  height: 7.5rem;
+  border-radius: var(--radius-lg);
+}
+@keyframes admin-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-skeleton-line,
+  .admin-skeleton-card {
+    animation: none;
+  }
+}
