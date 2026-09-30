@@ -14,27 +14,27 @@ interface HeroSlide {
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
     id: 'rinjani',
-    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rinjani.jpg?width=2070',
-    alt: 'Pemandangan puncak Gunung Rinjani dan Danau Segara Anak',
+    url: '/images/pexels/4552428.jpg',
+    alt: 'Kawah Gunung Rinjani dan danau Segara Anak yang berwarna toska',
     caption: 'Gunung Rinjani, Nusa Tenggara Barat',
   },
   {
-    id: 'prau',
-    url: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2071&auto=format&fit=crop',
-    alt: 'Samudra awan matahari terbit Gunung Prau Dieng',
-    caption: 'Gunung Prau, Dataran Tinggi Dieng',
-  },
-  {
-    id: 'bromo',
-    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Bromo.jpg?width=2070',
-    alt: 'Kaldera dan savana Taman Nasional Bromo Tengger Semeru',
+    id: 'bromo-semeru',
+    url: '/images/pexels/28386069.jpg',
+    alt: 'Matahari terbit di atas kaldera Bromo dengan Gunung Semeru di kejauhan',
     caption: 'Bromo Tengger Semeru, Jawa Timur',
   },
   {
-    id: 'atap-indonesia',
-    url: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Semeru.jpg?width=2070',
-    alt: 'Gugusan pegunungan dan panorama alam bebas',
-    caption: 'Atap Indonesia',
+    id: 'merbabu',
+    url: '/images/pexels/36665312.jpg',
+    alt: 'Lereng hijau Gunung Merbabu diselimuti awan di Jawa Tengah',
+    caption: 'Gunung Merbabu, Jawa Tengah',
+  },
+  {
+    id: 'semeru',
+    url: '/images/pexels/38730351.jpg',
+    alt: 'Gunung Semeru menjulang di atas hutan hijau dan air terjun',
+    caption: 'Gunung Semeru, Jawa Timur',
   },
 ];
 
