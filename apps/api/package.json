@@ -8,7 +8,8 @@
     "start": "node --env-file-if-exists=.env dist/main.js",
     "typecheck": "tsc --noEmit",
     "test": "node -r ts-node/register --test test/*.test.ts",
-    "test:db": "node --env-file-if-exists=../../.env -r ts-node/register --test test/database/*.test.ts"
+    "test:db": "node --env-file-if-exists=../../.env -r ts-node/register --test test/database/*.test.ts",
+    "build:vercel": "tsc -p tsconfig.build.json && esbuild dist/vercel.js --bundle --platform=node --target=node24 --format=cjs --packages=external --alias:@wildera/validation=../../packages/validation/src/index.ts --alias:@wildera/types=../../packages/types/src/index.ts --outfile=dist/server.js"
   },
   "dependencies": {
     "@nestjs/common": "12.0.3",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@types/express": "5.0.6",
     "@wildera/config": "*",
+    "esbuild": "0.28.2",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2"
   }

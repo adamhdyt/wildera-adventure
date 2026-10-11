@@ -12,6 +12,8 @@ export default [
       '**/coverage/**',
       '**/next-env.d.ts',
       '.local/**',
+      '.archify/**',
+      'apps/api/api/**', // CommonJS stub required by Vercel
       'references/**',
       'apps/api/src/generated/**',
     ],
