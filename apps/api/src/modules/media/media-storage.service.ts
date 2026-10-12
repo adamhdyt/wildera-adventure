@@ -8,16 +8,44 @@ export interface StoredFileResult {
   url: string;
 }
 
+const mimeByExtension: Record<string, string> = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+};
+
+/**
+ * Stores uploaded photos in Supabase Storage when SUPABASE_URL and
+ * SUPABASE_SECRET_KEY are set (required on Vercel, which has no persistent
+ * disk) and on the local filesystem otherwise (development and tests).
+ */
 @Injectable()
 export class MediaStorageService {
-  // ponytail: Local filesystem storage for dev/test; upgrade to S3 / Cloudflare R2 when S3_BUCKET is configured.
   private readonly uploadDir = path.resolve(process.cwd(), 'uploads');
+  private readonly supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
+  private readonly supabaseKey = process.env.SUPABASE_SECRET_KEY;
+  private readonly bucket = process.env.SUPABASE_STORAGE_BUCKET || 'media';
 
   constructor() {
-    // Ensure upload dir exists
-    fs.mkdir(this.uploadDir, { recursive: true }).catch(() => {
-      // ignore
-    });
+    if (!this.useSupabase) {
+      fs.mkdir(this.uploadDir, { recursive: true }).catch(() => {
+        // ignore
+      });
+    }
+  }
+
+  private get useSupabase(): boolean {
+    return Boolean(this.supabaseUrl && this.supabaseKey);
+  }
+
+  private supabaseHeaders(extra?: Record<string, string>) {
+    return {
+      Authorization: `Bearer ${this.supabaseKey}`,
+      apikey: this.supabaseKey as string,
+      ...extra,
+    };
   }
 
   async storeFile(params: {
@@ -34,6 +62,31 @@ export class MediaStorageService {
       : `.${params.extension}`;
     const objectKey = `uploads/${year}/${month}/${randomId}${safeExt}`;
 
+    if (this.useSupabase) {
+      const response = await fetch(
+        `${this.supabaseUrl}/storage/v1/object/${this.bucket}/${objectKey}`,
+        {
+          method: 'POST',
+          headers: this.supabaseHeaders({
+            'Content-Type':
+              mimeByExtension[safeExt.toLowerCase()] ??
+              'application/octet-stream',
+            'Cache-Control': 'max-age=31536000',
+          }),
+          body: new Uint8Array(params.buffer),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Supabase Storage upload failed (${response.status}): ${await response.text()}`,
+        );
+      }
+      return {
+        objectKey,
+        url: `${this.supabaseUrl}/storage/v1/object/public/${this.bucket}/${objectKey}`,
+      };
+    }
+
     const fullPath = path.resolve(process.cwd(), objectKey);
     await fs.mkdir(path.dirname(fullPath), { recursive: true });
     await fs.writeFile(fullPath, params.buffer);
@@ -43,6 +96,15 @@ export class MediaStorageService {
   }
 
   async deleteFile(objectKey: string): Promise<void> {
+    if (this.useSupabase) {
+      // Photos that predate Supabase live in /images (static) and have no
+      // object to remove; Supabase answers 200/404 for those keys.
+      await fetch(
+        `${this.supabaseUrl}/storage/v1/object/${this.bucket}/${objectKey}`,
+        { method: 'DELETE', headers: this.supabaseHeaders() },
+      ).catch(() => undefined);
+      return;
+    }
     const fullPath = this.resolveFullPath(objectKey);
     await fs.rm(fullPath, { force: true });
   }

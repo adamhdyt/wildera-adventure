@@ -2,6 +2,10 @@
 
 import { useRef, useState } from 'react';
 import type { MediaAsset } from '@wildera/types';
+import {
+  MAX_UPLOAD_BYTES,
+  prepareImageForUpload,
+} from '../../../../lib/prepare-image';
 
 interface Props {
   initialItems: MediaAsset[];
@@ -11,7 +15,6 @@ interface Props {
 }
 
 const PAGE_SIZE = 48;
-const MAX_BYTES = 5 * 1024 * 1024;
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 function formatBytes(value: number | string) {
@@ -109,13 +112,19 @@ export function MediaClient({
     const uploaded: MediaAsset[] = [];
     const errors: string[] = [];
 
-    for (const file of list) {
-      if (!ACCEPTED.includes(file.type)) {
-        errors.push(`${file.name}: format harus JPG, PNG, atau WebP.`);
+    for (const original of list) {
+      if (!ACCEPTED.includes(original.type)) {
+        errors.push(
+          `${original.name}: format harus JPG, PNG, WebP, atau AVIF.`,
+        );
         continue;
       }
-      if (file.size > MAX_BYTES) {
-        errors.push(`${file.name}: ukuran melebihi 5 MB.`);
+      // Large photos are resized in the browser to fit Vercel's 4.5 MB body limit.
+      const file = await prepareImageForUpload(original);
+      if (file.size > MAX_UPLOAD_BYTES) {
+        errors.push(
+          `${original.name}: masih lebih dari 3 MB setelah dikecilkan.`,
+        );
         continue;
       }
       try {
