@@ -1,14 +1,20 @@
 import 'reflect-metadata';
 import { RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { AppLogger } from './common/logger/app-logger.service';
 import { securityHeaders } from './common/security/security-headers.middleware';
 import { rateLimiter } from './common/security/rate-limiter.middleware';
 
 export async function createApp() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
   app.useLogger(app.get(AppLogger));
+
+  // Photo uploads arrive as base64 JSON (up to ~5 MB), above the 100 kB default.
+  app.useBodyParser('json', { limit: '8mb' });
 
   // Security Middleware
   app.use(securityHeaders());
