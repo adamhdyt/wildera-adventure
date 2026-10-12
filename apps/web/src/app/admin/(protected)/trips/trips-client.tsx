@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import { prepareImageForUpload } from '../../../../lib/prepare-image';
 import { useMemo, useState, useTransition } from 'react';
 import type {
   ContentStatus,
@@ -404,9 +405,10 @@ export function TripsClient({
     e: React.ChangeEvent<HTMLInputElement>,
     role: 'COVER' | 'GALLERY',
   ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const original = e.target.files?.[0];
+    if (!original) return;
     setUploadingMedia(true);
+    const file = await prepareImageForUpload(original);
     try {
       const formData = new FormData();
       formData.append('file', file);
