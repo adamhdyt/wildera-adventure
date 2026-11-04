@@ -379,10 +379,8 @@ export class MountainService {
 
     const updated = await this.prisma.mountain.update({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-        status: ContentStatus.ARCHIVED,
-      },
+      // Archive keeps the row so admins can find and restore it.
+      data: { status: ContentStatus.ARCHIVED },
     });
 
     if (audit?.adminUserId) {

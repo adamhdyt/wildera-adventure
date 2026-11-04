@@ -371,10 +371,8 @@ export class RouteService {
 
     await this.prisma.route.update({
       where: { id },
-      data: {
-        status: 'ARCHIVED',
-        deletedAt: new Date(),
-      },
+      // Archive keeps the row so admins can find and restore it.
+      data: { status: 'ARCHIVED' },
     });
 
     await this.logAudit({
@@ -383,7 +381,7 @@ export class RouteService {
       entityId: id,
       entityType: 'ROUTE',
       oldData: existing,
-      newData: { status: 'ARCHIVED', deletedAt: new Date() },
+      newData: { status: 'ARCHIVED' },
       ipAddress: audit.ipAddress,
       userAgent: audit.userAgent,
     });

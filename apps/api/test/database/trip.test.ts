@@ -485,14 +485,15 @@ test('Trip CRUD end-to-end API lifecycle, relations, and audit trail', async () 
     const deleteJson = (await deleteRes.json()) as Trip;
     assert.equal(deleteJson.status, 'ARCHIVED');
 
-    // Deleted trip should not be found
+    // Archived trip stays available to admins so it can be restored
     const verifyDelete = await fetch(
       `${baseUrl}/api/v1/admin/trips/${trip1.id}`,
       {
         headers: { Cookie: cookie },
       },
     );
-    assert.equal(verifyDelete.status, 404);
+    assert.equal(verifyDelete.status, 200);
+    assert.equal(((await verifyDelete.json()) as Trip).status, 'ARCHIVED');
 
     // 13. Verify Audit Logs
     const auditLogs = await db.query(

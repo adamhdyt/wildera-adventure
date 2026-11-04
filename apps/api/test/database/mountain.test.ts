@@ -263,21 +263,22 @@ test('Mountain CRUD end-to-end API lifecycle, relations, and validation', async 
     );
     assert.equal(deleteRes.status, 200);
 
-    // 13. Mountain no longer listed
+    // 13. Archived mountain stays listed for admins with ARCHIVED status
     const listAfterDelete = await fetch(`${baseUrl}/api/v1/admin/mountains`, {
       headers: { Cookie: sessionCookie },
     });
     const listAfterDeleteJson = await listAfterDelete.json();
-    assert.equal(listAfterDeleteJson.data.total, 0);
+    assert.equal(listAfterDeleteJson.data.total, 1);
+    assert.equal(listAfterDeleteJson.data.items[0].status, 'ARCHIVED');
 
-    // 14. Get by ID returns 404
+    // 14. Get by ID still works so it can be restored
     const getAfterDelete = await fetch(
       `${baseUrl}/api/v1/admin/mountains/${rinjaniId}`,
       {
         headers: { Cookie: sessionCookie },
       },
     );
-    assert.equal(getAfterDelete.status, 404);
+    assert.equal(getAfterDelete.status, 200);
 
     // 15. Verify audit log entries in DB
     const audits = await db.query(

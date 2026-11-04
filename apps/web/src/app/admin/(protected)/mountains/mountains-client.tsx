@@ -204,10 +204,14 @@ export function MountainsClient({
           return;
         }
 
-        setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === deletingItem.id ? { ...i, status: 'ARCHIVED' } : i,
+          ),
+        );
         setFeedback({
           type: 'success',
-          message: `Gunung "${deletingItem.name}" berhasil diarsipkan.`,
+          message: `Gunung "${deletingItem.name}" diarsipkan. Pilih filter status Archived untuk melihat atau memulihkannya lewat Edit.`,
         });
         setDeletingItem(null);
       } catch (err) {
@@ -230,7 +234,12 @@ export function MountainsClient({
     ) {
       return false;
     }
-    if (statusFilter !== 'ALL' && item.status !== statusFilter) {
+    // "Semua" hides archived rows; pick the Archived filter to see and restore them.
+    if (
+      statusFilter === 'ALL'
+        ? item.status === 'ARCHIVED'
+        : item.status !== statusFilter
+    ) {
       return false;
     }
     if (
@@ -414,13 +423,15 @@ export function MountainsClient({
                           >
                             Edit
                           </button>
-                          <button
-                            type="button"
-                            className="btn-sm btn-danger"
-                            onClick={() => setDeletingItem(item)}
-                          >
-                            Arsipkan
-                          </button>
+                          {item.status !== 'ARCHIVED' && (
+                            <button
+                              type="button"
+                              className="btn-sm btn-danger"
+                              onClick={() => setDeletingItem(item)}
+                            >
+                              Arsipkan
+                            </button>
+                          )}
                         </div>
                       </td>
                     )}

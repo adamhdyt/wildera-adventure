@@ -171,7 +171,12 @@ export function TripsClient({
       if (tripTypeFilter !== 'ALL' && item.tripType !== tripTypeFilter) {
         return false;
       }
-      if (statusFilter !== 'ALL' && item.status !== statusFilter) {
+      // "Semua" hides archived rows; pick the Archived filter to see and restore them.
+      if (
+        statusFilter === 'ALL'
+          ? item.status === 'ARCHIVED'
+          : item.status !== statusFilter
+      ) {
         return false;
       }
       if (difficultyFilter !== 'ALL' && item.difficulty !== difficultyFilter) {
@@ -672,10 +677,14 @@ export function TripsClient({
           return;
         }
 
-        setItems((prev) => prev.filter((it) => it.id !== deletingItem.id));
+        setItems((prev) =>
+          prev.map((it) =>
+            it.id === deletingItem.id ? { ...it, status: 'ARCHIVED' } : it,
+          ),
+        );
         setFeedback({
           type: 'success',
-          message: `Trip "${deletingItem.name}" berhasil diarsipkan.`,
+          message: `Trip "${deletingItem.name}" diarsipkan. Pilih filter status Archived untuk melihat atau memulihkannya lewat Edit.`,
         });
         setDeletingItem(null);
       } catch {
@@ -1266,14 +1275,16 @@ export function TripsClient({
                       >
                         Edit
                       </button>
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn-danger"
-                        style={{ padding: '0.35rem 0.65rem' }}
-                        onClick={() => handleArchive(item)}
-                      >
-                        Arsipkan
-                      </button>
+                      {item.status !== 'ARCHIVED' && (
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn-danger"
+                          style={{ padding: '0.35rem 0.65rem' }}
+                          onClick={() => handleArchive(item)}
+                        >
+                          Arsipkan
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
