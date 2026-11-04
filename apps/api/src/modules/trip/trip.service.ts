@@ -532,10 +532,8 @@ export class TripService {
 
     const archived = await this.prisma.trip.update({
       where: { id },
-      data: {
-        status: 'ARCHIVED',
-        deletedAt: new Date(),
-      },
+      // Archive keeps the row so admins can find and restore it.
+      data: { status: 'ARCHIVED' },
       include: {
         mountain: {
           select: {

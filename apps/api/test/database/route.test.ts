@@ -276,14 +276,15 @@ test('Route CRUD end-to-end API lifecycle, one mountain multiple routes, and aud
     );
     assert.equal(deleteRes.status, 200);
 
-    // 14. Detail after delete returns 404
+    // 14. Archived route stays available to admins with ARCHIVED status
     const detailDeleted = await fetch(
       `${baseUrl}/api/v1/admin/routes/${sembalun.id}`,
       {
         headers: { Cookie: cookie },
       },
     );
-    assert.equal(detailDeleted.status, 404);
+    assert.equal(detailDeleted.status, 200);
+    assert.equal((await detailDeleted.json()).status, 'ARCHIVED');
 
     // 15. Audit logs recorded
     const auditLogs = await db.query(

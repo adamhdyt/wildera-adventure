@@ -64,7 +64,12 @@ export function RoutesClient({
     if (mountainFilter !== 'ALL' && item.mountainId !== mountainFilter) {
       return false;
     }
-    if (statusFilter !== 'ALL' && item.status !== statusFilter) {
+    // "Semua" hides archived rows; pick the Archived filter to see and restore them.
+    if (
+      statusFilter === 'ALL'
+        ? item.status === 'ARCHIVED'
+        : item.status !== statusFilter
+    ) {
       return false;
     }
     if (difficultyFilter !== 'ALL' && item.difficulty !== difficultyFilter) {
@@ -255,10 +260,14 @@ export function RoutesClient({
           return;
         }
 
-        setItems((prev) => prev.filter((it) => it.id !== deletingItem.id));
+        setItems((prev) =>
+          prev.map((it) =>
+            it.id === deletingItem.id ? { ...it, status: 'ARCHIVED' } : it,
+          ),
+        );
         setFeedback({
           type: 'success',
-          message: `Jalur "${deletingItem.name}" berhasil diarsipkan.`,
+          message: `Jalur "${deletingItem.name}" diarsipkan. Pilih filter status Archived untuk melihat atau memulihkannya lewat Edit.`,
         });
         setDeletingItem(null);
       } catch {
@@ -455,13 +464,15 @@ export function RoutesClient({
                       >
                         Edit
                       </button>
-                      <button
-                        type="button"
-                        className="btn-action-delete"
-                        onClick={() => setDeletingItem(item)}
-                      >
-                        Arsipkan
-                      </button>
+                      {item.status !== 'ARCHIVED' && (
+                        <button
+                          type="button"
+                          className="btn-action-delete"
+                          onClick={() => setDeletingItem(item)}
+                        >
+                          Arsipkan
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
